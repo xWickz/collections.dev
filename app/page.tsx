@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Container from "@/components/container";
 import ArticleCard from "@/components/article-card";
+import Container from "@/components/container";
 import { getAllArticles } from "@/lib/mdx";
 
 const MAX_ARTICLES: number = 4;
@@ -10,6 +10,8 @@ export default async function HomePage() {
 
   return (
     <main className="py-12">
+      <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+
       <Container>
         <section className="mb-12">
           <h1 className="mb-4 text-4xl font-bold tracking-tight">

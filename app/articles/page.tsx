@@ -1,7 +1,7 @@
-import Container from "@/components/container";
-import ArticleCard from "@/components/article-card";
-import { getAllArticles } from "@/lib/mdx";
 import type { Metadata } from "next";
+import ArticleCard from "@/components/article-card";
+import Container from "@/components/container";
+import { getAllArticles } from "@/lib/mdx";
 
 export const metadata: Metadata = {
   title: "Articulos | collections.dev",
@@ -12,7 +12,7 @@ export default async function ArticlesPage() {
   const articles = await getAllArticles();
 
   return (
-    <main className="py-12">
+    <main className="py-12 font-sans">
       <Container>
         <header className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight">Articulos</h1>

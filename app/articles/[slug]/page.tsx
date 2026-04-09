@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Container from "@/components/container";
 import { getAllArticles, getArticleBySlug } from "@/lib/mdx";
 
@@ -48,7 +48,7 @@ export default async function ArticlePage({ params }: PageProps) {
   return (
     <main className="py-12">
       <Container>
-        <article className="prose prose-invert max-w-none">
+        <article className="prose prose-invert max-w-none font-sans">
           <header className="mb-10 border-b border-white/10 pb-6">
             <p className="mb-3 text-sm uppercase tracking-tight text-zinc-500">
               {meta.category}

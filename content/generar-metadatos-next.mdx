@@ -1,0 +1,49 @@
+export const meta = {
+  title: "Generar Metadatos",
+  description: "¿Cómo colocar metadatos según la página en Next.js?",
+  category: "nextjs",
+  tags: ["nextjs", "metadata", "react"],
+  publishedAt: "2026-04-06",
+  published: true,
+};
+
+**¿Cómo colocar metadatos según la página en Next.js?**
+
+Lo primero de todo es, en el **layout.tsx** colocar el siguiente código:
+
+```tsx
+  title: {
+    default: "Titulo",
+    template: "%s | Titulo", // De aqui toma la referencia
+  },
+```
+
+Luego en las otras páginas, colocamos así:
+
+Si es estático, sería algo así:
+
+```tsx
+export const metadata: Metadata = {
+  title: "Titulo",
+  description: "Descripcion opcional",
+};
+```
+
+Si es dinámico, sería algo así:
+
+```tsx
+export async function generateMetadata({
+  TUS_PARAMETROS,
+}: TUS_PROPIEDADES): Promise<Metadata> {
+  
+  // Tus validaciones...
+
+  // POR EJEMPLO
+  return {
+    title: article.meta.title,
+    description: article.meta.description,
+  };
+}
+```
+
+Listo!
