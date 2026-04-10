@@ -1,12 +1,18 @@
 import Link from "next/link";
 import ArticleCard from "@/components/article-card";
 import Container from "@/components/container";
+import Search from "@/components/search";
 import { getAllArticles } from "@/lib/mdx";
 
-const MAX_ARTICLES: number = 4;
+const MAX_ARTICLES: number = 10;
 
-export default async function HomePage() {
-  const articles = (await getAllArticles()).slice(0, MAX_ARTICLES);
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ query?: string }>;
+}) {
+  const query = (await searchParams)?.query || "";
+  const articles = (await getAllArticles(query)).slice(0, MAX_ARTICLES);
 
   return (
     <main className="py-12">
@@ -28,15 +34,21 @@ export default async function HomePage() {
             >
               Ver artículos
             </Link>
+
+            <Search placeholder="Buscar artículos..." />
           </div>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-2xl font-semibold">Últimos artículos</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
-            ))}
+            {articles.length > 0 ? (
+              articles.map((article) => (
+                <ArticleCard key={article.slug} article={article} />
+              ))
+            ) : (
+              <p className="text-zinc-500">No se encontraron artículos.</p>
+            )}
           </div>
         </section>
       </Container>

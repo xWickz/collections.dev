@@ -17,7 +17,9 @@ type MdxModule = {
   meta: ArticleMeta;
 };
 
-export async function getAllArticles(): Promise<ArticleListItem[]> {
+export async function getAllArticles(
+  query?: string,
+): Promise<ArticleListItem[]> {
   const files = getAllMdxFiles();
 
   const articles = await Promise.all(
@@ -32,12 +34,21 @@ export async function getAllArticles(): Promise<ArticleListItem[]> {
     }),
   );
 
-  return articles
+  const filteredArticles = articles
     .filter((article) => article.published)
-    .sort(
-      (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
-    );
+    .filter((article) => {
+      if (!query) return true;
+      const searchTerm = query.toLowerCase();
+      return (
+        article.title?.toLowerCase().includes(searchTerm) ||
+        article.description?.toLowerCase().includes(searchTerm)
+      );
+    });
+
+  return filteredArticles.sort(
+    (a, b) =>
+      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+  );
 }
 
 export async function getArticleBySlug(
@@ -52,6 +63,8 @@ export async function getArticleBySlug(
   if (!fileName) return null;
 
   const mod = (await import(`@/content/${fileName}`)) as MdxModule;
+
+  if (!mod.meta.published && process.env.NODE_ENV === "production") return null;
 
   return {
     meta: mod.meta,
