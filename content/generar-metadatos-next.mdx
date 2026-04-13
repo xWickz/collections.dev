@@ -7,38 +7,38 @@ export const meta = {
   published: true,
 };
 
-**¿Cómo colocar metadatos según la página en Next.js?**
+**¿Cómo colocar metadatos según la página en Next.js?** Veamos como se hace! Podría ser útil.
 
-Lo primero de todo es, en el **layout.tsx** colocar el siguiente código:
+Lo primero de todo es, en el `layout.tsx` colocar el siguiente código:
 
-```tsx
+```ts
   title: {
     default: "Titulo",
     template: "%s | Titulo", // De aqui toma la referencia
   },
 ```
 
-Luego en las otras páginas, colocamos así:
+## Opción Estática vs Dinámica
 
-Si es estático, sería algo así:
+Si tenemos una página estática, simplemente exportamos un objeto llamado `metadata` con la información:
 
-```tsx
+```ts
 export const metadata: Metadata = {
   title: "Titulo",
   description: "Descripcion opcional",
 };
 ```
 
-Si es dinámico, sería algo así:
+En cambio, si nuestra página es dinámica, por ejemplo porque recibe parámetros, entonces exportamos una función asíncrona llamada `generateMetadata` que recibe como argumento un objeto con los parámetros de la ruta:
 
-```tsx
+```ts
 export async function generateMetadata({
   TUS_PARAMETROS,
 }: TUS_PROPIEDADES): Promise<Metadata> {
   
   // Tus validaciones...
 
-  // POR EJEMPLO
+  // Por ejemplo:
   return {
     title: article.meta.title,
     description: article.meta.description,
@@ -46,4 +46,34 @@ export async function generateMetadata({
 }
 ```
 
-Listo!
+¿Quieres un ejemplo más real? Te adjunto el cómo he utilizado los **metadatos dinámicos** en mi proyecto **CaseShell**. Digamos que tengo mi ruta `app/game/[difficulty]/page.tsx` y quiero colocar un título y descripción según la dificultad que se elija. Para eso, exporto la función `generateMetadata` de esta forma:
+
+```ts
+export async function generateMetadata({
+  params,
+}: GameDifficultyPageProps): Promise<Metadata> {
+  const { difficulty } = await params;
+  const validDifficulties: Difficulty[] = ["easy", "medium", "hard"];
+  if (!validDifficulties.includes(difficulty as Difficulty)) {
+    notFound();
+  }
+
+  if (difficulty === "easy") {
+    return {
+      title: "Acceso Denegado",
+    };
+  } else if (difficulty === "medium") {
+    return {
+      title: "Fuga de Datos",
+    };
+  } else if (difficulty === "hard") {
+    return {
+      title: "Colapso Crítico",
+    };
+  }
+}
+```
+
+[Puedes consultar el código completo haciendo clic aquí](https://github.com/xWickz/CaseShell-Hackaton/blob/main/src/app/game/%5Bdifficulty%5D/page.tsx). ¡Así es como lo hago! Quizás no es la forma más optimizada pero me sirve.
+
+Listo! Así de fácil es colocar metadatos según la página en Next.js.

@@ -17,9 +17,10 @@
     "next": "16.2.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "rehype-highlight": "^7.0.2",
     "rehype-pretty-code": "0.14.3",
-    "shiki": "3.20.0",
-    "use-debounce": "^10.1.1"
+    "shiki": "2.5.0",
+    "use-debounce": "10.1.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

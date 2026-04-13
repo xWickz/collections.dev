@@ -46,19 +46,19 @@ export default async function ArticlePage({ params }: PageProps) {
   const { Post, meta } = article;
 
   return (
-    <main className="py-12">
+    <main className="py-12 bg-void-eclipse text-snow-white min-h-screen">
       <Container>
         <article className="prose prose-invert max-w-none font-sans">
           <header className="mb-10 border-b border-white/10 pb-6">
-            <p className="mb-3 text-sm uppercase tracking-tight text-zinc-500">
+            <p className="mb-1 text-sm uppercase tracking-tight text-zinc-500">
               {meta.category}
             </p>
 
-            <h1 className="mb-3 text-4xl font-bold tracking-tight">
+            <h1 className="text-4xl font-bold tracking-tight">
               {meta.title.replace("| collections.dev", "")}
             </h1>
 
-            <p className="text-black">{meta.description}</p>
+            <p className="text-snow-white/90">{meta.description}</p>
           </header>
 
           <Post />

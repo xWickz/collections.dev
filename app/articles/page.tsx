@@ -12,7 +12,7 @@ export default async function ArticlesPage() {
   const articles = await getAllArticles();
 
   return (
-    <main className="py-12 font-sans">
+    <main className="py-12 font-sans bg-void-eclipse">
       <Container>
         <header className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight">Articulos</h1>
