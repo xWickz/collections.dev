@@ -7,4 +7,136 @@ export const meta = {
   published: true,
 };
 
-Pacienciaaaa, lo estoy haciendo :) 
+En este artículo te enseñaré a cómo implementar una búsqueda y paginación en Next.js. Para este ejemplo particular, la barra de búsqueda que te mostraré cómo implementar es la que muestra Next.js en sus **ejemplos prácticos**, la cuál es muy util!
+
+## Implementación de la barra de búsqueda 
+
+Lo primero, debemos crear un archivo llamado `search.tsx` y colocar el siguiente código:
+
+```tsx
+"use client";
+
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
+
+export default function Search({ placeholder }: { placeholder: string }) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const handleSearch = useDebouncedCallback((term) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
+    if (term) {
+      params.set("query", term);
+    } else {
+      params.delete("query");
+    }
+    replace(`${pathname}?${params.toString()}`);
+    console.log(term); // Recomendable eliminar este console.log en producción
+  }, 300);
+
+  return (
+    <div className="relative flex flex-1 flex-shrink-0">
+      <label htmlFor="search" className="sr-only">
+        Search
+      </label>
+      <input
+        className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+        placeholder={placeholder}
+        onChange={(e) => {
+          handleSearch(e.target.value);
+        }}
+        defaultValue={searchParams.get("query")?.toString()}
+      />
+      <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+    </div>
+  );
+}
+```
+
+¡Tranquilo! Te lo voy a explicar para que entiendas bien todo.
+
+## Explicación del componente de búsqueda (`search.tsx`)
+- `useSearchParams`: Este hook de Next.js nos permite acceder a los parámetros de búsqueda en la URL. En este caso, lo usamos para obtener el término de búsqueda actual y para actualizarlo cuando el usuario escribe algo nuevo.
+- `usePathname`: Este hook nos da la ruta actual, lo cual es útil para mantenernos en la misma página cuando actualizamos los parámetros de búsqueda.
+- `useRouter`: Este hook nos proporciona métodos para navegar programáticamente. En este caso, usamos `replace` para actualizar la URL sin recargar la página.
+- `useDebouncedCallback`: Este hook de la biblioteca `use-debounce` nos permite crear una función que se ejecuta después de un retraso específico (en este caso, 300 ms) después de la última vez que se llamó. Esto es útil para evitar hacer demasiadas actualizaciones de URL mientras el usuario está escribiendo.
+- El `input` tiene un `onChange` que llama a `handleSearch` cada vez que el usuario escribe algo. `handleSearch` actualiza los parámetros de búsqueda en la URL, lo que a su vez puede ser utilizado para filtrar los resultados en la página.
+Ahora, para implementar la paginación, simplemente debemos colocar el siguiente código en la parte inferior de nuestra página:
+
+Ahora bien, fíjate algo. Cuando ejecutamos esta parte del código:
+
+```tsx
+  const handleSearch = useDebouncedCallback((term) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
+    if (term) {
+      params.set("query", term);
+    } else {
+      params.delete("query");
+    }
+    replace(`${pathname}?${params.toString()}`);
+    console.log(term); // Recomendable eliminar este console.log en producción
+  }, 300);
+```
+
+Fíjate que estamos llamando a `params.set("page", "1")`. Esto es para que cada vez que el usuario escriba algo nuevo en la barra de búsqueda, la paginación se reinicie a la página 1. De esta forma, evitamos que el usuario se quede en una página vacía si estaba navegando por las páginas anteriores.
+Sin embargo, si tú no tienes paginación implementada, puedes eliminar esa línea sin problema.
+
+**¡Muy bien!** Ahora ya sabes cómo implementar una barra de búsqueda con Next.js y cómo reiniciar la paginación cada vez que el usuario escriba algo nuevo. Esto es muy útil para mejorar la experiencia del usuario en tu aplicación.
+
+Ahora te preguntarás, ¿cómo implemento este componente en mi página? **Sencillo**. Te mostraré como lo hago yo en este sitio web exactamente.
+
+En este caso, fijate que en mi página principal tengo la barra de busquedas, que está atada a el componente `LatestArticles.tsx`, mi componente empieza así:
+
+```ts
+export default async function LatestArticles({
+  searchParams,
+}: {
+  searchParams?: Promise<{ query?: string }>;
+}) {
+
+  const query = (await searchParams)?.query || "";
+  const articles = await getAllArticles(query)
+  
+  return (
+    <>
+      // Código existente...
+        {articles.length > 0 ? (
+          articles.map((article) => (
+            <ArticleCard key={article.slug} article={article} />
+          ))
+        ) : (
+          <p>No se encontraron artículos.</p>
+        )}
+      // Código existente...
+    </>
+  );
+}
+```
+
+Y luego, en la página principal, simplemente coloco el componente `Search` de esta forma:
+
+```tsx
+import Search from "@/components/search";
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ query?: string }>;
+}) {
+  return (
+    <main>
+      // Código existente...
+      <Suspense fallback={<p>Cargando búsqueda...</p>}>
+        <Search placeholder="Buscar artículos..." />
+      </Suspense>
+      <LatestArticles searchParams={searchParams} />
+    </main>
+  );
+}
+```
+
+¡Y listo! De esta forma, cada vez que el usuario escriba algo en la barra de búsqueda, se actualizará la URL con el término de búsqueda y se reiniciará la paginación a la página 1. Además, el componente `LatestArticles` se encargará de mostrar los artículos filtrados según el término de búsqueda. En mi caso, no tengo paginación aún, pero sigue los mismos principios.
