@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Hero from "@/components/Hero";
 import LatestArticles from "@/components/LatestArticles";
-import Search from "@/components/Search";
+import Search from "@/components/search";
 
 export default async function HomePage({
   searchParams,
