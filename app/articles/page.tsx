@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import ArticleCard from "@/components/article-card";
-import Container from "@/components/container";
+import ArticleCard from "@/components/ui/article-card";
+import Container from "@/components/ui/container";
 import { getAllArticles } from "@/lib/mdx";
 
 export const metadata: Metadata = {

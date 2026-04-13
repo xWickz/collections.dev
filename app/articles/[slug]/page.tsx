@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Container from "@/components/container";
+import Container from "@/components/ui/container";
 import { getAllArticles, getArticleBySlug } from "@/lib/mdx";
 
 type PageProps = {

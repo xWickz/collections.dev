@@ -3,11 +3,38 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Alternativas a negro */
+  --midnight-abyss: #0b1215;
+  --shadow-dept: #0f171f;
+  --deep-sky: #011122;
+  --storm-harbor: #020c1a;
+  --void-eclipse: #0b0b0b;
+  --obdisian-grey: #161616;
+
+  /* Alternativas a blanco */
+  --snow-white: #f2f6fc;
+  --frost-white: #fbfaf2;
+  --winter-white: #f9fdfe;
+  --creamy-white: #fffff5;
+  --egg-shell: #f9feff;
+  --blaanc-de-blanc: #efefef;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-midnight-abyss: var(--midnight-abyss);
+  --color-shadow-dept: var(--shadow-dept);
+  --color-deep-sky: var(--deep-sky);
+  --color-storm-harbor: var(--storm-harbor);
+  --color-void-eclipse: var(--void-eclipse);
+  --color-obsidian-grey: var(--obsidian-grey);
+  --color-snow-white: var(--snow-white);
+  --color-frost-white: var(--frost-white);
+  --color-winter-white: var(--winter-white);
+  --color-egg-shell: var(--egg-shell);
+  --color-blaanc: var(--blaanc-de-blanc);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
