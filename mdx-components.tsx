@@ -20,13 +20,21 @@ function Pre(props: React.HTMLAttributes<HTMLPreElement>) {
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     h1: (props: React.HTMLAttributes<HTMLElement>) => (
-      <h1 {...props} className="mb-6 text-4xl font-bold tracking-tight" />
+      <>
+        <h1
+          {...props}
+          className="mb-6 text-4xl font-bold tracking-tight border-b border-white/10"
+        />
+      </>
     ),
     h2: (props: React.HTMLAttributes<HTMLElement>) => (
-      <h2 {...props} className="mb-4 mt-10 text-2xl font-semibold" />
+      <h2
+        {...props}
+        className="mb-2 mt-10 text-2xl font-semibold border-b border-white/10 pb-3"
+      />
     ),
     h3: (props: React.HTMLAttributes<HTMLElement>) => (
-      <h3 {...props} className="mb-3 mt-8 text-xl font-semibold" />
+      <h3 {...props} className="mb-3 mt-3 text-xl font-semibold" />
     ),
     p: (props: React.HTMLAttributes<HTMLElement>) => (
       <p {...props} className="mb-4 leading-7 " />
