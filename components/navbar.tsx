@@ -15,7 +15,7 @@ const navbarItems: Readonly<NavbarItems[]> = [
 
 export default function Navbar() {
   return (
-    <header className="border-b border-white/10 bg-void-eclipse backdrop-blur font-mono px-12">
+    <header className="border-b border-white/10 bg-void-eclipse backdrop-blur font-pixel px-12">
       <nav className="flex h-16 items-center justify-between">
         <Link href="/" className="text-lg font-semibold text-white">
           collections.dev
