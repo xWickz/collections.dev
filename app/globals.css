@@ -37,6 +37,8 @@
   --color-blaanc: var(--blaanc-de-blanc);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-pixel: var(--font-geist-pixel-grid);
+  --font-pixel-grid: var(--font-geist-pixel-grid);
 }
 
 @media (prefers-color-scheme: dark) {

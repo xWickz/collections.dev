@@ -7,7 +7,7 @@ type Props = {
 
 export default function ArticleCard({ article }: Props) {
   return (
-    <article className="rounded-md border border-white/20 bg-midnight-abyss p-5 font-mono">
+    <article className="rounded-md border border-white/20 bg-midnight-abyss p-5 font-pixel">
       <p className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-snow-white/80 w-min mb-2">
         {article.category}
       </p>

@@ -1,3 +1,4 @@
+import { GeistPixelGrid } from "geist/font/pixel";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Footer from "@/components/Footer";
@@ -14,6 +15,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const pixelGrid = GeistPixelGrid;
+
 export const metadata: Metadata = {
   title:
     "collections.dev | Recolección de artículos y recursos sobre desarrollo web",
@@ -28,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${pixelGrid.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col ">
         <Navbar />

@@ -12,7 +12,7 @@ export default async function LatestArticles({
   const articles = (await getAllArticles(query)).slice(0, MAX_ARTICLES);
   return (
     <>
-      <h2 className="text-2xl font-semibold text-snow-white mt-8 mb-6 tracking-tight font-mono">
+      <h2 className="text-2xl font-semibold text-snow-white mt-8 mb-6 tracking-tight font-pixel">
         Últimos artículos
       </h2>
       <div className="grid gap-4 md:grid-cols-2">
