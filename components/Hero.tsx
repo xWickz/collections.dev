@@ -21,13 +21,13 @@ export default function Hero() {
   return (
     <div className="text-snow-white font-pixel items-center flex flex-col">
       <h1
-        className={`text-6xl font-bold transition-colors duration-500 ${
+        className={`text-6xl max-sm:text-5xl font-bold transition-colors duration-500 ${
           isGreen ? "text-green-400" : "text-snow-white"
         }`}
       >
         collections.dev
       </h1>
-      <p className="text-snow-white/90">
+      <p className="text-snow-white/90 text-center">
         Colección de recursos, artículos y herramientas
       </p>
     </div>
