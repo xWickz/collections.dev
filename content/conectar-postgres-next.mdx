@@ -9,5 +9,184 @@ export const meta = {
 
 ¡Hola! En esta guía sencilla conectaremos una base de datos **PostgreSQL** con **Next.js** y así utilizar mejor los **Server Actions** en vez de tener que hacer una carpeta aparte de backend... levantar un servidor Express... configurar las API Routes, si bien en algunas ocasiones es conveniente usar las **API Routes** en vez de **Server Actions**, exploremos un poco esto que seguro que es interesante.
 
+⚠️ *Guía un poco incompleta, faltan algunos detalles claves, pero es un buen punto de partida para conectar tu base de datos con Next.js y empezar a usar las Server Actions.*
 ## Dependencias
-En primer lugar, las depedencias necesarias serán: **postgres**
+En primer lugar, las depedencias necesarias serán: **`postgres`** y **`bcrypt`** en caso de querer encriptar contraseñas. Además, te enseñaré a cómo poblar tu base de datos con información básica o de prueba.
+
+## Instalación de la Base de Datos
+
+Si no quieres instalar nada de **manera local**, nos vamos a dirigir a **Vercel** y vamos a crear un repositorio de nuestro proyecto deseado o (no recomendado del todo) en un proyecto ya existente. A partir de esto, vamos a crear la base de datos siguiendo los pasos:
+1. Seleccionar el **proyecto** en el que quieres crear la base de datos.
+2. Dirigete a la sección de **Storage** y haz click en **Create Database**.
+3. Selecciona **Neon** o **PostgreSQL** y haz click en **Continue**.
+4. Te va a pedir cosas básicas como **nombre** y detalles sencillos.
+
+**¡Listo!** Una vez creada la base de datos, te mostrará información importante para colocar en **.env** o **.env.local**, algo así:
+
+![Datos sensibles](https://i.imgur.com/C5D7xB0.png)
+
+Esta información, la copiarás y pegarás en tu **.env** o **.env.local** como mencioné.
+
+¡Listo! Ya puedes comenzar a usar **PostgreSQL** de esta forma invocas a tu base de datos desde cualquier instancia:
+
+```ts
+import postgres from "postgres";
+const sql = postgres(process.env.POSTGRES_URL || "", { ssl: "require" });
+```
+
+## Poblar la base de datos
+¡Vamos a poblar la base de datos! Primero que todo, en nuestro directorio `app` vamos a crear una carpeta (si gustas) y un archivo llamado `placeholders.ts`, el cuál contendrá la información que deseas poblar en tu base de datos, por ejemplo:
+
+```ts
+const users = [
+  {
+    id: "410544b2-4001-4271-9855-fec4b6a6442a",
+    name: "User",
+    email: "user@nextmail.com",
+    password: "123456",
+  },
+];
+
+const customers = [
+  {
+    id: "d6e15727-9fe1-4961-8c5b-ea44a9bd81aa",
+    name: "Evil Rabbit",
+    email: "evil@rabbit.com",
+    image_url: "/customers/evil-rabbit.png",
+  },
+];
+
+export { users, customers };
+```
+
+En este caso, tu lo poblarás acorde a los datos que necesites según las tablas y relaciones que tengas en tu base de datos, pero esto es solo un ejemplo para mostrarte cómo hacerlo.
+
+Después de crear los placeholders, para poblar la base de datos, vamos a crear un archivo llamado `seed.ts` en nuestro directorio `app` y colocaremos el siguiente código:
+
+```ts
+import bcrypt from "bcrypt"; // Opcional: Si quieres encriptar contraseñas
+import postgres from "postgres";
+import { customers, users } from "@/app/lib/placeholders"; // La que creamos hace rato
+
+const sql = postgres(process.env.POSTGRES_URL || "", { ssl: "require" });
+
+async function seedUsers() {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS users (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL
+    );
+  `;
+
+  const insertedUsers = await Promise.all(
+    users.map(async (user) => {
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      return sql`
+        INSERT INTO users (id, name, email, password)
+        VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
+        ON CONFLICT (id) DO NOTHING;
+      `;
+    }),
+  );
+
+  return insertedUsers;
+}
+
+async function seedCustomers() {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS customers (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      image_url VARCHAR(255) NOT NULL
+    );
+  `;
+
+  const insertedCustomers = await Promise.all(
+    customers.map(
+      (customer) => sql`
+        INSERT INTO customers (id, name, email, image_url)
+        VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
+        ON CONFLICT (id) DO NOTHING;
+      `,
+    ),
+  );
+
+  return insertedCustomers;
+}
+
+export async function GET() {
+  try {
+    const result = await sql.begin((sql) => [seedUsers(), seedCustomers()]);
+
+    return Response.json({ message: "Database seeded successfully" });
+  } catch (error) {
+    return Response.json({ error }, { status: 500 });
+  }
+}
+```
+
+En este código, estamos creando dos funciones `seedUsers` y `seedCustomers` para poblar las tablas `users` y `customers` respectivamente. Además, estamos utilizando `bcrypt` para encriptar las contraseñas de los usuarios antes de insertarlos en la base de datos.
+
+Para ejecutar el seeding, simplemente haz una petición `GET` a la ruta donde tengas este archivo `seed.ts`, por ejemplo, si lo tienes en `app/api/seed/route.ts`, haz una petición a `/seed`y esto ejecutará el seeding de tu base de datos.
+
+Es decir, iriamos a `http://localhost:3000/seed` y esto ejecutará el seeding de tu base de datos. **¡Listo!** Ahora tu base de datos ya está poblada con la información que colocaste en los placeholders.
+
+Claro, tú puedes adaptar esto a según tus criterios y lo que necesites, pero esto es solo un ejemplo para mostrarte cómo hacerlo de forma sencilla y rápida.
+
+## Recuperando datos con Server Actions
+Ahora que ya tenemos nuestra base de datos poblada, vamos a recuperar los datos utilizando **Server Actions**. Para esto, vamos a crear un archivo llamado `getCustomers.ts` o incluso un archivo general básico llamado `actions.ts` en nuestro directorio `app/lib` y colocaremos el siguiente código:
+
+```ts
+import postgres from "postgres";
+
+const sql = postgres(process.env.POSTGRES_URL || "", { ssl: "require" });
+
+export async function fetchCustomers() {
+  try {
+    const customers = await sql<[]>`
+      SELECT
+        id,
+        name
+      FROM customers
+      ORDER BY name ASC
+    `;
+
+    return customers;
+  } catch (err) {
+    console.error("Database Error:", err);
+    throw new Error("Failed to fetch all customers.");
+  }
+}
+```
+
+¡Listo! Ahora ya tenemos una función `fetchCustomers` que se encarga de recuperar los datos de la tabla `customers` de nuestra base de datos. Puedes crear funciones similares para recuperar datos de otras tablas o con diferentes filtros según tus necesidades.
+
+Ahora, para utilizar esta función en tu componente, simplemente la importas y la llamas dentro de un componente que sea un **Server Component** o dentro de una **Server Action**. Por ejemplo:
+
+```ts
+import { fetchCustomers } from "@/app/lib/actions";
+export default async function CustomersList() {
+  const customers = await fetchCustomers();
+
+  return (
+    <div>
+      <h1>Customers</h1>
+      <ul>
+        {customers.map((customer) => (
+          <li key={customer.id}>{customer.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+En este ejemplo, estamos importando la función `fetchCustomers` y la estamos llamando dentro de un componente llamado `CustomersList`. Este componente es un **Server Component** porque está utilizando una función asíncrona para recuperar los datos de la base de datos. Luego, simplemente renderizamos la lista de clientes en el frontend.
+
+**¡Y listo!** De esta forma, puedes conectar tu base de datos PostgreSQL con Next.js y utilizar las **Server Actions** para recuperar datos de forma sencilla y rápida. Esto es muy útil para evitar tener que configurar un backend separado y aprovechar al máximo las capacidades de Next.js.
