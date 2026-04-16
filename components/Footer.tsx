@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <header className="border-t border-snow-white/10 bg-void-eclipse backdrop-blur font-mono px-12">
+    <header className="border-snow-white/10 bg-void-eclipse backdrop-blur font-pixel px-12">
       <nav className="flex h-16 items-center justify-between max-sm:flex-col max-sm:gap-4 max-sm:py-3 max-sm:h-auto">
         <Link
           href="/"

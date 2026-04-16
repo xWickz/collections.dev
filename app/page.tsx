@@ -1,7 +1,5 @@
-import { Suspense } from "react";
 import Hero from "@/components/Hero";
 import LatestArticles from "@/components/LatestArticles";
-import Search from "@/components/search";
 
 export default async function HomePage({
   searchParams,
@@ -9,14 +7,11 @@ export default async function HomePage({
   searchParams?: Promise<{ query?: string }>;
 }) {
   return (
-    <main className="min-h-screen py-12 px-12 bg-void-eclipse">
-      <Hero />
-      <Suspense
-        fallback={<p className="text-zinc-500 mt-8">Cargando búsqueda...</p>}
-      >
-        <Search placeholder="Buscar artículos..." />
-      </Suspense>
-      <LatestArticles searchParams={searchParams} />
+    <main className=" bg-void-eclipse flex flex-col justify-center">
+      <div className="mx-auto w-full max-w-5xl px-4 py-12">
+        <Hero />
+        <LatestArticles searchParams={searchParams} />
+      </div>
     </main>
   );
 }
