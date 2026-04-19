@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Container from "@/components/ui/container";
-import { getAllArticles, getArticleBySlug } from "@/lib/mdx";
+import {
+  getAllArticleSlugs,
+  getArticleBySlug,
+  getArticleMetaBySlug,
+} from "@/lib/mdx";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
-  const articles = await getAllArticles();
+  const slugs = await getAllArticleSlugs();
 
-  return articles.map((article) => ({
-    slug: article.slug,
+  return slugs.map((slug) => ({
+    slug,
   }));
 }
 
@@ -21,17 +25,17 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const meta = await getArticleMetaBySlug(slug);
 
-  if (!article) {
+  if (!meta) {
     return {
       title: "Artículo no encontrado",
     };
   }
 
   return {
-    title: article.meta.title,
-    description: article.meta.description,
+    title: meta.title,
+    description: meta.description,
   };
 }
 

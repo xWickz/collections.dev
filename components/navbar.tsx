@@ -12,25 +12,32 @@ const navbarItems = [
 
 export default function Navbar() {
   return (
-    <header className="border-b border-white/10 bg-void-eclipse backdrop-blur font-pixel px-12">
-      <nav className="relative flex h-16 items-center justify-between">
-        <Link href="/" className="z-10 text-lg font-semibold text-white">
+    <header className="border-b border-white/10 bg-void-eclipse/95 backdrop-blur font-pixel px-4 sm:px-6 lg:px-12">
+      <nav className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-3 py-3 md:h-16 md:grid-cols-[auto_minmax(320px,1fr)_auto] md:gap-6 md:py-0">
+        <Link
+          href="/"
+          className="text-base font-semibold text-white sm:text-lg md:justify-self-start"
+        >
           collections.dev
         </Link>
 
-        <div className="absolute left-1/2 top-1/2 w-full max-w-md -translate-x-1/2 -translate-y-1/2">
+        <div className="w-full md:max-w-xl md:justify-self-center">
           <Suspense
             fallback={
-              <p className="text-zinc-500 mt-8">Cargando búsqueda...</p>
+              <p className="text-sm text-zinc-500">Cargando búsqueda...</p>
             }
           >
             <Search placeholder="Buscar artículos..." />
           </Suspense>
         </div>
 
-        <div className="z-10 flex items-center gap-6 text-sm text-zinc-300">
+        <div className="flex items-center gap-4 text-sm text-zinc-300 md:justify-self-end md:gap-6">
           {navbarItems.map((item) => (
-            <Link href={item.link} key={item.name} className="hover:text-white">
+            <Link
+              href={item.link}
+              key={item.name}
+              className="transition-colors hover:text-white"
+            >
               {item.name}
             </Link>
           ))}
