@@ -48,7 +48,7 @@ export const getAllArticleSlugs = cache(async (): Promise<string[]> => {
 });
 
 export const getAllArticles = cache(
-  async (query?: string): Promise<ArticleListItem[]> => {
+  async (query?: string, type?: string): Promise<ArticleListItem[]> => {
     const files = getAllMdxFiles();
 
     const articles = files
@@ -70,9 +70,15 @@ export const getAllArticles = cache(
       .filter((article) => {
         if (!query) return true;
         const searchTerm = query.toLowerCase();
+
+        if (type === "category") {
+          return article.category?.toLowerCase().includes(searchTerm);
+        }
+
         return (
           article.title?.toLowerCase().includes(searchTerm) ||
-          article.description?.toLowerCase().includes(searchTerm)
+          article.description?.toLowerCase().includes(searchTerm) ||
+          article.tags.some((tag) => tag.toLowerCase().includes(searchTerm))
         );
       });
 

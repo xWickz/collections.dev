@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Container from "@/components/ui/container";
 import {
@@ -48,21 +49,34 @@ export default async function ArticlePage({ params }: PageProps) {
   }
 
   const { Post, meta } = article;
+  const dateStr = meta.publishedAt;
+  const dateObj = new Date(dateStr + "T00:00:00");
+  const formattedDate = dateObj.toLocaleDateString("es-ES", {
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <main className="py-12 bg-void-eclipse text-snow-white min-h-screen">
       <Container>
         <article className="prose prose-invert max-w-none font-sans">
           <header className="mb-10 border-b border-white/10 pb-6">
-            <p className="mb-1 text-sm uppercase tracking-tight text-zinc-500">
-              {meta.category}
+            <p className="mb-1 text-sm uppercase tracking-tight text-zinc-500 text-center">
+              <Link
+                href={`/articles?type=category&query=${encodeURIComponent(meta.category)}`}
+                className="hover:text-zinc-300 transition-colors"
+              >
+                {meta.category} - {formattedDate}
+              </Link>
             </p>
 
-            <h1 className="text-4xl font-bold tracking-tight">
+            <h1 className="text-5xl font-bold tracking-tight text-center">
               {meta.title.replace("| collections.dev", "")}
             </h1>
 
-            <p className="text-snow-white/90">{meta.description}</p>
+            <p className="text-snow-white/90 text-center text-md font-medium mt-4">
+              {meta.description}
+            </p>
           </header>
 
           <Post />

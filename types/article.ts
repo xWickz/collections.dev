@@ -9,4 +9,5 @@ export type ArticleMeta = {
 
 export type ArticleListItem = ArticleMeta & {
   slug: string;
+  type: string;
 };

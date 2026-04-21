@@ -6,7 +6,7 @@ import LatestArticles, {
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ query?: string }>;
+  searchParams?: Promise<{ query?: string; type?: string }>;
 }) {
   return (
     <main className="bg-void-eclipse flex flex-col justify-center">

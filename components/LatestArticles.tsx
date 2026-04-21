@@ -28,10 +28,12 @@ export function LatestArticlesSkeleton() {
 export default async function LatestArticles({
   searchParams,
 }: {
-  searchParams?: Promise<{ query?: string }>;
+  searchParams?: Promise<{ query?: string; type?: string }>;
 }) {
+  const type = (await searchParams)?.type || "articles";
   const query = (await searchParams)?.query || "";
-  const articles = (await getAllArticles(query)).slice(0, MAX_ARTICLES);
+
+  const articles = (await getAllArticles(query, type)).slice(0, MAX_ARTICLES);
   return (
     <>
       <h2 className="text-2xl font-semibold text-snow-white mt-8 mb-6 tracking-tight font-pixel">
