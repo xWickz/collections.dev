@@ -1,6 +1,4 @@
-                                                 
-<div>
-<center>
+<div align="center">
 
 ![](./public/ascii-art-text.png)   
 
@@ -8,7 +6,6 @@
 **Colección de recursos de desarrollo web.**
 
 [collections.dev](https://collections-dev.vercel.app/)
-</center>
 </div>
 
 ## Descripción
