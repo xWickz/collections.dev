@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+                                                 
+<div>
+<center>
 
-## Getting Started
+![](./public/ascii-art-text.png)   
 
-First, run the development server:
+# collections.dev
+**Colección de recursos de desarrollo web.**
 
+[collections.dev](https://collections-dev.vercel.app/)
+</center>
+</div>
+
+## Descripción
+Este proyecto es una colección de recursos de desarrollo web, incluyendo tutoriales, herramientas, bibliotecas y otros materiales útiles para desarrolladores. El objetivo es proporcionar un lugar centralizado donde los desarrolladores puedan encontrar recursos de alta calidad para mejorar sus habilidades y conocimientos en el desarrollo web.
+
+## Características
+- **Recursos Curados**: Todos los recursos incluidos en la colección han sido cuidadosamente seleccionados para garantizar su calidad y relevancia.
+- **Categorías**: Los recursos están organizados en categorías para facilitar la navegación y búsqueda.
+- **Actualizaciones Regulares**: La colección se actualiza regularmente con nuevos recursos para mantenerla relevante y útil.
+- **Contribuciones Abiertas**: Los desarrolladores pueden contribuir con nuevos recursos a través de pull requests en el repositorio de GitHub.
+
+## ¿Cómo instalarlo de forma local?
+Si quieres instalarlo de forma local, ya que **no necesitas una base de datos** para que funcione, puedes clonar el repositorio y agregar tus propios archivos **.mdx**!
+
+1. Clona el repositorio:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/xWickz/collections.dev.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Navega al directorio del proyecto:
+```bash
+cd collections.dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Instala las dependencias:
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Inicia el servidor de desarrollo:
+```bash
+pnpm dev
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Agregar archivos 
+Si deseas agregar archivos customizados, puedes crear archivos **.mdx** dentro de la carpeta `content`. Asegúrate de seguir la estructura y formato adecuados para que los recursos se muestren correctamente en la aplicación.
