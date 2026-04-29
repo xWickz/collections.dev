@@ -10,6 +10,7 @@ export type ArticleMeta = {
   tags: string[];
   publishedAt: string;
   published: boolean;
+  author?: string;
 };
 
 export type ArticleListItem = ArticleMeta & {

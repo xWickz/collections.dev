@@ -5,6 +5,7 @@ export type ArticleMeta = {
   tags: string[];
   publishedAt: string;
   published: boolean;
+  author?: string; // Author name must be same as GitHub
 };
 
 export type ArticleListItem = ArticleMeta & {
