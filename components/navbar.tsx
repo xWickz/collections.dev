@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import Search from "@/components/search";
+import { GitHub } from "@/components/svg/icons";
 import type { NavbarItems } from "@/lib/definitions";
 
 const navbarItems = [
@@ -16,7 +17,7 @@ export default function Navbar() {
       <nav className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-3 py-3 md:h-16 md:grid-cols-[auto_minmax(320px,1fr)_auto] md:gap-6 md:py-0">
         <Link
           href="/"
-          className="text-base font-semibold text-white sm:text-lg md:justify-self-start"
+          className="text-base font-semibold text-white sm:text-lg md:justify-self-start text-center"
         >
           collections.dev
         </Link>
@@ -31,7 +32,7 @@ export default function Navbar() {
           </Suspense>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-zinc-300 md:justify-self-end md:gap-6">
+        <div className="flex items-center gap-4 text-sm text-zinc-300 md:justify-self-end md:gap-6 text-center justify-center">
           {navbarItems.map((item) => (
             <Link
               href={item.link}
@@ -41,6 +42,14 @@ export default function Navbar() {
               {item.name}
             </Link>
           ))}
+          <a
+            href="https://github.com/xWickz/collections.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-white"
+          >
+            <GitHub width={20} height={20} />
+          </a>
         </div>
       </nav>
     </header>

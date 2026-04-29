@@ -7,8 +7,8 @@ type Props = {
 
 export default function ArticleCard({ article }: Props) {
   return (
-    <article className="flex flex-col h-full rounded-md border border-white/20 bg-midnight-abyss p-5 font-pixel">
-      <div className="flex-grow">
+    <article className="flex flex-col h-full rounded-md border border-white/20 bg-midnight-abyss/10 p-5 font-pixel">
+      <div className="grow">
         <h2 className="mb-0.5 text-xl font-semibold text-snow-white tracking-tight">
           <Link href={`/articles/${article.slug}`} className="hover:underline">
             {article.title.replace("| collections.dev", "")}

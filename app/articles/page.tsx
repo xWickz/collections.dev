@@ -12,7 +12,9 @@ type ArticlesPageProps = {
   searchParams?: Promise<{ query?: string; type?: string }>;
 };
 
-export default async function ArticlesPage({ searchParams }: ArticlesPageProps) {
+export default async function ArticlesPage({
+  searchParams,
+}: ArticlesPageProps) {
   const params = await searchParams;
   const query = params?.query ?? "";
   const type = params?.type ?? "articles";
@@ -22,7 +24,9 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
     <main className="py-12 font-sans bg-void-eclipse">
       <Container>
         <header className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight">Articulos</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-white">
+            Articulos
+          </h1>
         </header>
 
         {articles.length > 0 ? (
