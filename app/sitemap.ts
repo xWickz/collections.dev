@@ -3,7 +3,6 @@ import { getAllArticles } from "@/lib/mdx";
 
 const BASE_URL = "https://collections.wickz.dev";
 
-export const revalidate = 60 * 60 * 24;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = await getAllArticles();
