@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ClientTranslator from "@/components/ClientTranslator";
 import Container from "@/components/ui/container";
 import {
   getAllArticleSlugs,
@@ -94,6 +95,8 @@ export default async function ArticlePage({ params }: PageProps) {
           <Post />
         </article>
       </Container>
+
+      <ClientTranslator defaultTarget="en" />
     </main>
   );
 }
