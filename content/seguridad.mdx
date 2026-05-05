@@ -12,40 +12,13 @@ Hemos visto últimamente muchas aplicaciones web o incluso software que están h
 
 La **seguridad**. 
 
-Priorizar la seguridad en nuestros proyectos es fundamental y me atrevería a decir que es **obligatorio** para garantizar que no solo nuestros usuarios estén protegidos, sino también para salvaguardar nuestra propia aplicación de posibles ataques o vulnerabilidades. Por ejemplo, exponer nuestras **API Keys** o no validar correctamente los datos. 
+Priorizar la seguridad en nuestros proyectos es fundamental y me atrevería a decir que es **obligatorio** para garantizar que no solo nuestros usuarios estén protegidos, sino también para salvaguardar nuestra propia aplicación de posibles ataques o vulnerabilidades. 
+
+Por ejemplo, exponer nuestras **API Keys** o no validar correctamente los datos. 
 
 Esto se acaba, **hoy**.
 
-Te mostraré algunas formas de asegurar de forma básica tu sitio web o proyecto, para que no tengas que preocuparte por eso. 
-
-## HTTPS Siempre
-
-Sirve tu sitio solo por **HTTPS** y redirecciona todo lo que venga por HTTP. Esto evita que alguien intercepte sesiones o datos sensibles. Si puedes, habilita **HSTS** (estrictamente HTTPS).
-
-## Headers de Seguridad
-
-Headers simples ayudan mucho sin tocar el frontend. En Next.js puedes agregarlos así:
-
-```ts
-// next.config.ts
-const securityHeaders = [
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Content-Security-Policy", value: "default-src 'self'" },
-];
-
-export default {
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: securityHeaders,
-      },
-    ];
-  },
-};
-```
+Te mostraré algunas formas de asegurar de forma básica tu sitio web o proyecto, para que no tengas que preocuparte por eso!
 
 ## Validación de Entradas y Sanitización
 
@@ -393,6 +366,39 @@ export async function POST(req: NextRequest) {
 
 Mantener dependencias al dia evita vulnerabilidades conocidas. Haz revisiones periodicas con `pnpm audit` o el equivalente.
 
-## Conclusión
+## HTTPS Siempre
 
-La seguridad no es opcional, es una responsabilidad. Implementar estas medidas básicas puede marcar la diferencia entre un proyecto vulnerable y uno robusto. ¡No dejes que la seguridad sea un pensamiento tardío, intégrala desde el principio!
+Sirve tu sitio solo por **HTTPS** y redirecciona todo lo que venga por HTTP. Esto evita que alguien intercepte sesiones o datos sensibles. Si puedes, habilita **HSTS** (estrictamente HTTPS).
+
+## Headers de Seguridad
+
+Headers simples ayudan mucho sin tocar el frontend. En Next.js puedes agregarlos así:
+
+```ts
+// next.config.ts
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Content-Security-Policy", value: "default-src 'self'" },
+];
+
+export default {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: securityHeaders,
+      },
+    ];
+  },
+};
+```
+
+# Conclusión
+
+Hemos visto ahora como poder asegurar de forma básica una aplicación. Hay muchísimas más formas de hacerlo, todo depende de qué trate tu aplicación.
+
+Espero que este artículo te haya servido para una noción básica.
+
+Un saludo.

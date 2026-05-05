@@ -23,7 +23,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <>
         <h1
           {...props}
-          className="mb-6 text-4xl font-bold tracking-tight border-b border-white/10"
+          className="mb-6 mt-10 text-4xl font-bold tracking-tight border-b border-white/10 pb-2"
         />
       </>
     ),
