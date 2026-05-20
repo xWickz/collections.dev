@@ -1,0 +1,126 @@
+export const meta = {
+  title: "5 errores comunes al usar React",
+  description: "La mayoría de los desarrolladores de React se lanzan a Next.js y se traen consigo todos sus viejos hábitos... ",
+  category: "react",
+  tags: ["react", "nextjs", "dev"],
+  publishedAt: "2026-05-20",
+  published: true,
+  author: "xWickz"
+};
+
+
+La mayoría de los desarrolladores de React se lanzan a Next.js y se traen consigo todos sus viejos hábitos: `useEffect` para los datos, `useClient` en todo y React Router en el código.
+
+Estos cinco errores te cuestan rendimiento, posicionamiento en buscadores y horas de depuración.
+
+**Veamos cuales son, aprende y hagamos un código más mantenible:**
+
+## 1. `use client` no es una importación de **React**
+
+Por ejemplo, tenemos: 
+```tsx
+'use client'
+
+export default function UserCard({ name }) {
+    return <div>{name}</div>
+}
+```
+
+↑ Esto, manda **JavaScript al navegador de forma innecesaria**. La alternativa (correcta) es:
+
+```tsx
+export default function UserCard({ name }) {
+    return <div>{name}</div>
+}
+```
+
+↑ Esto, no manda JavaScript al navegador y es **componente servidor por defecto**. Por lo tanto, **CERO JavaScript** es lo que se envia al cliente. `use client` crea un límite (boundary). Solo úsalo cuando utilizas **hooks** o **APIs de navegador**.
+
+## 2. Deja de usar `useEffect` para cargar datos
+
+```tsx
+'use client'
+
+useEffect(() => {
+    fetch('/api/data')
+        .then(res => res.json())
+        .then(data => setData(data))
+}, [])
+```
+
+↑ ¡Esto esta mal! El flujo que realiza es **Navegador** → **API** → **Estado** → **Re-render**. Esto es un gran problema para el SEO, el rendimiento y la experiencia del usuario. La alternativa (correcta) es:
+
+```tsx
+export default async function Post() {
+    const posts = await fetch('api/posts', {
+        next: { revalidate: 3600 } // Caché built-in
+    })
+
+    return <PostList posts={posts} />
+}
+```
+
+↑ Esto está bien... El flujo que realiza ahora es **Servidor** → **Listo para renderizar**
+
+## 3. React Router no siempre pertenece aquí...
+
+```tsx
+import { BrowserRouter, Route } from 'react-router-dom'
+```
+
+↑ Aquí hay dependencias innecesarias, si estás utilizando **Next.js**, veamoslo, se mezcla un flujo bastante poco intuitivo dentro de nuestro código: **BrowserRouter** → **Route** → **Config** → **Nested Routes** → **Layered Router**... ¡Lo bueno es que **Next.js** ya maneja las rutas!
+
+Por ejemplo, una arquitectura de rutas para Next.js, sería:
+
+```tsx
+app/
+  page.tsx
+  about/
+    page.tsx
+blog/
+    page.tsx
+    [slug]/ // ruta dinamica
+        page.tsx 
+```
+
+¡Esto es todo lo que necesitas! No hay necesidad de instalar React Router, ni de configurar rutas anidadas, ni nada por el estilo. Next.js se encarga de todo eso por ti.
+
+## 4. React Context no sirve en servidor
+
+```tsx
+import { useContext } from 'react'
+import { ThemeContext } from './context'
+
+export default function Header() {
+    const theme = useContext(ThemeContext) // Esto no funciona en componentes servidor, solo en componentes cliente
+
+    return <header className={theme}>...</header>
+}
+```
+
+↑ Esto va a explotar en componentes del servidor. Además, envuelve los providers a nivel de layout. La forma correcta sería, el provedor aislado en un componente de cliente, y luego se le pasa una propiedad **children** y de esta forma no explota en componentes del servidor.
+
+## 5. No obtengas tus datos de API Routes desde el servidor
+
+```tsx
+const data = await fetch('http://localhost:3000/api/data')
+```
+
+↑ ¡No! Este es el flujo incorrecto. Además, se romperá en producción lo más probable. Además, el servidor se la pasará llamandose asimismo constantemente lo cuál provocará latencia. Lo ideal sería:
+
+```tsx
+import { getUser } from '@/lib/db'
+const user = await getUser() // Llamada directa a la función del servidor, sin necesidad de pasar por API Routes
+```
+
+↑ ¿Lo ves? Ahora hace una llamada **directa a la base de datos** es más limpio y rápido.
+
+Para hacerlo fácil y rápido de entender para ti...
+
+**¿Necesita hook/API de navegador?**
+1. Sí → `use client`
+2. No → Componente servidor por defecto
+
+## Conclusión
+
+Estos son los errores más comunes que cometen los desarrolladores de React al usar Next.js. Evitarlos te ayudará a mejorar el rendimiento, el SEO y la experiencia del usuario de tu aplicación. Recuerda siempre pensar en el flujo de datos y en qué parte del stack estás trabajando para tomar las decisiones correctas. 
