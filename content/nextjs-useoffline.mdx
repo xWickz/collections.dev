@@ -1,0 +1,81 @@
+export const meta = {
+  title: "Next.js: useOffline para tu app",
+  description: "¿Qué es useOffline y cómo usarlo?",
+  category: "nextjs",
+  tags: ["nextjs", "useoffline", "react"],
+  publishedAt: "2026-09-11",
+  published: true,
+  author: "xWickz"
+};
+
+# El secreto para una mejor experiencia en Next.js: Detectar cuando el usuario no tiene internet
+
+Cuando navegamos por internet, a veces la conexión falla. En aplicaciones modernas construidas con Next.js, ahora es posible manejar estos momentos de desconexión de forma automática gracias a una nueva función experimental oficial llamada `useOffline`.
+
+## ¿Qué es useOffline?
+
+Es una herramienta (un hook) que te dice si la persona que usa tu página está conectada a internet o no. Lo interesante es que, al activarla, Next.js se encarga automáticamente de detectar la conexión y reintentar las acciones que fallaron cuando el internet regrese.
+
+## ¿Cómo se activa?
+
+Como es una función experimental, primero debes encenderla en la configuración de tu proyecto. En el archivo `next.config.js` debes agregar lo siguiente:
+
+```javascript
+module.exports = {
+  experimental: {
+    useOffline: true,
+  },
+}
+```
+
+## ¿Cómo se usa?
+
+Una vez activado, puedes importar y usar la función en tus componentes cliente. El hook te devolverá `true` si el usuario no tiene internet (ya sea porque falló una petición de red o porque el navegador avisó), y `false` si está conectado.
+
+Aquí tienes un ejemplo de cómo crear un cartel que avise al usuario que ha perdido la conexión:
+
+```jsx
+'use client'
+
+import { useOffline } from 'next/offline'
+
+export function BannerDesconectado() {
+  const estaDesconectado = useOffline()
+
+  if (!estaDesconectado) {
+    return null
+  }
+
+  return (
+    <div className="alerta-offline">
+      Estás sin conexión. Es posible que no puedas ver todo el contenido.
+    </div>
+  )
+}
+```
+
+Este cartel lo puedes poner en tu archivo principal de diseño (`layout.tsx`) para que aparezca en cualquier página si el internet se cae.
+
+## Otro uso genial: Mensajes de carga
+
+Si un usuario intenta abrir una página nueva mientras está sin internet, puedes mostrarle un mensaje amigable en lugar de dejar la pantalla en blanco. Usando `useOffline` en tu archivo de carga (`loading.tsx`), se vería así:
+
+```jsx
+'use client'
+
+import { useOffline } from 'next/offline'
+
+export default function Cargando() {
+  const estaDesconectado = useOffline()
+
+  return (
+    <div>
+      {estaDesconectado 
+        ? 'Esperando a que regrese el internet para cargar esta página...' 
+        : 'Cargando...'}
+    </div>
+  )
+}
+```
+
+Lo mejor de todo es que, en cuanto vuelva el internet, Next.js reintentará cargar la página automáticamente. Es una forma excelente de cuidar la experiencia de tus usuarios.
