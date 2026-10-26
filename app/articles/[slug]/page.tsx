@@ -84,6 +84,7 @@ export default async function ArticlePage({ params }: PageProps) {
                   alt={meta.author}
                   width={32}
                   height={32}
+                  unoptimized
                   className="rounded-full inline-block mr-2"
                 />
               )}
