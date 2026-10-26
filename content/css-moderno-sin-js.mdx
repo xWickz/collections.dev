@@ -1,0 +1,154 @@
+export const meta = {
+  title: "CSS moderno: borra ese JavaScript",
+  description: "7 cosas que antes hacías con JavaScript y que hoy CSS hace solo. ¡Menos código, menos bugs!",
+  category: "css",
+  tags: ["css", "html", "web", "frontend"],
+  publishedAt: "2026-10-26",
+  published: true,
+  author: "xWickz"
+};
+
+¿Cuántas veces has instalado una librería o escrito un `useEffect` solo para que un `textarea` crezca, para cerrar un menú o para estilizar al padre de un elemento? Bueno... **CSS ya hace todo eso solo**.
+
+El CSS de 2026 no es el mismo de hace unos años. Muchas cosas que antes necesitaban JavaScript hoy funcionan en todos los navegadores modernos, sin dependencias y sin escribir una sola línea de JS.
+
+**Veamos 7 de ellas, ¡vamos a por ello!**
+
+## 1. `field-sizing`: textareas que crecen solos
+
+El clásico: un `textarea` que se agranda mientras el usuario escribe. Antes necesitabas un script que midiera el `scrollHeight` en cada `input`. Ahora:
+
+```css
+textarea {
+  field-sizing: content;
+  min-height: 3lh;  /* mínimo 3 líneas */
+  max-height: 10lh; /* máximo 10 líneas, luego scroll */
+}
+```
+
+**¡Listo!** También funciona con `input` y `select`, se ajustan al ancho de su contenido.
+
+## 2. `:has()`: el selector del padre
+
+Durante años se dijo que en CSS "no se puede seleccionar al padre". Pues ya se puede:
+
+```css
+/* La card cambia si tiene una imagen dentro */
+.card:has(img) {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+}
+
+/* Marcar el formulario si algún campo es inválido */
+form:has(input:user-invalid) button[type="submit"] {
+  opacity: 0.5;
+}
+```
+
+Eso último es útil: `:user-invalid` solo se activa después de que el usuario interactúa con el campo, no apenas carga la página.
+
+## 3. Popover API: menús y tooltips sin JS
+
+Un menú desplegable que se cierra al hacer click afuera o al presionar `Esc`. Antes: estado, listeners, `useRef`... Ahora es HTML puro:
+
+```html
+<button popovertarget="menu">Abrir menú</button>
+
+<div id="menu" popover>
+  <a href="/perfil">Perfil</a>
+  <a href="/ajustes">Ajustes</a>
+</div>
+```
+
+El navegador se encarga de abrirlo, cerrarlo, del "click afuera", del `Esc` y de ponerlo por encima de todo (sin pelear con `z-index`).
+
+## 4. `:open`: estilos cuando algo está abierto
+
+Combina perfecto con lo anterior. `:open` aplica estilos a `<details>`, `<dialog>` y `<select>` solo mientras están abiertos:
+
+```css
+details:open summary {
+  font-weight: bold;
+  color: royalblue;
+}
+
+dialog:open {
+  animation: aparecer 0.2s ease-out;
+}
+```
+
+## 5. `@starting-style`: animar al aparecer
+
+Animar algo que pasa de `display: none` a visible siempre fue un dolor de cabeza. Con `@starting-style` le dices al navegador desde dónde empezar la transición:
+
+```css
+[popover] {
+  transition: opacity 0.3s, scale 0.3s, display 0.3s allow-discrete;
+  opacity: 1;
+  scale: 1;
+
+  @starting-style {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+```
+
+Tu popover del punto 3 ahora aparece con una animación suave. ¡Sin Framer Motion!
+
+## 6. `contrast-color()`: texto siempre legible
+
+¿Tienes botones cuyo color de fondo elige el usuario o viene de la base de datos? `contrast-color()` elige automáticamente blanco o negro según cuál se lea mejor:
+
+```css
+.tag {
+  background: var(--color-usuario);
+  color: contrast-color(var(--color-usuario));
+}
+```
+
+Se acabaron las funciones para calcular la luminancia en JavaScript.
+
+## 7. `text-wrap: balance`: títulos que no quedan feos
+
+¿Te ha pasado que un título queda con una sola palabra en la última línea? Esto lo arregla:
+
+```css
+h1, h2, h3 {
+  text-wrap: balance; /* reparte las palabras entre líneas */
+}
+
+p {
+  text-wrap: pretty; /* evita palabras huérfanas al final */
+}
+```
+
+Una línea de CSS y tus títulos se ven mucho más profesionales.
+
+## Bonus: CSS nesting
+
+Ya no necesitas Sass solo para anidar selectores. CSS lo soporta de forma nativa (como viste en el punto 5):
+
+```css
+.card {
+  padding: 1rem;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  .titulo {
+    font-size: 1.25rem;
+  }
+}
+```
+
+## ¿Puedo usarlo ya?
+
+Todo lo de este artículo es **Baseline**, es decir, funciona en Chrome, Edge, Firefox y Safari actuales. Algunas son muy recientes (como `field-sizing`, `:open` y `contrast-color()`), así que si tu público usa navegadores viejos, revisa en [Can I use](https://caniuse.com/) o en [web.dev/baseline](https://web.dev/baseline) antes de usarlas en producción.
+
+## Conclusión
+
+Cada línea de JavaScript que no escribes es una línea que no se rompe, no hay que mantener y no pesa en el bundle. Antes de instalar una librería para algo visual, pregúntate: **¿esto ya lo hace CSS?** Muchas veces la respuesta es sí.
+
+¿Cuál de estas no conocías? ¿Conoces algún otro truco de CSS que reemplace JavaScript? ¡Déjamelo saber!

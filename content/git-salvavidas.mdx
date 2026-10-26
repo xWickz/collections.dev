@@ -1,0 +1,136 @@
+export const meta = {
+  title: "Comandos de Git que te salvan la vida",
+  description: "¿Borraste un commit? ¿Hiciste push a la rama equivocada? Estos comandos de Git te sacan de cualquier apuro.",
+  category: "git",
+  tags: ["git", "terminal", "productividad"],
+  publishedAt: "2026-10-26",
+  published: true,
+  author: "xWickz"
+};
+
+Todos hemos pasado por ese momento: haces un `git reset --hard` y sientes un escalofrío porque acabas de borrar horas de trabajo. O haces un commit en `main` cuando debía ir en otra rama.
+
+**Tranquilo.** Git casi nunca borra nada de verdad. Veamos los comandos que te sacan de esos apuros, ¡vamos a por ello!
+
+## 1. `git reflog`: la máquina del tiempo
+
+Este es el más importante de todos. `reflog` guarda **todo** lo que ha pasado en tu repositorio, incluso commits que "borraste".
+
+```bash
+git reflog
+```
+
+Verás algo así:
+
+```bash
+a1b2c3d HEAD@{0}: reset: moving to HEAD~3
+f4e5d6c HEAD@{1}: commit: agregar login
+9g8h7i6 HEAD@{2}: commit: arreglar navbar
+```
+
+¿Quieres volver a como estaba antes del reset? Simplemente:
+
+```bash
+git reset --hard f4e5d6c
+```
+
+**¡Listo!** Tu trabajo ha vuelto. Recuerda que esto solo funciona con cosas que hayas **commiteado** alguna vez.
+
+## 2. Me equivoqué en el mensaje del último commit
+
+```bash
+git commit --amend -m "el mensaje correcto"
+```
+
+¿Se te olvidó agregar un archivo al commit? También:
+
+```bash
+git add archivo-olvidado.ts
+git commit --amend --no-edit
+```
+
+⚠️ *Solo haz esto si todavía **no** has hecho push. Si ya lo subiste, mejor haz un commit nuevo.*
+
+## 3. Hice commit en la rama equivocada
+
+Hiciste commit en `main` pero debía ir en `feature/login`:
+
+```bash
+git branch feature/login   # crea la rama con tu commit
+git reset --hard HEAD~1    # quita el commit de main
+git switch feature/login   # ¡y listo, tu commit está aquí!
+```
+
+## 4. `git stash`: guardar cambios para después
+
+Estás a mitad de algo y te piden arreglar un bug urgente en otra rama. No quieres hacer commit de algo a medias:
+
+```bash
+git stash push -m "login a medias"  # guarda tus cambios
+git switch main                      # arregla el bug...
+git switch -                         # vuelve a tu rama
+git stash pop                        # recupera tus cambios
+```
+
+Con `git stash list` ves todo lo que tienes guardado.
+
+## 5. Deshacer un commit que ya subiste
+
+Si ya hiciste push, **no** uses `reset` (le romperías el historial a tus compañeros). Usa `revert`, que crea un commit nuevo que deshace el anterior:
+
+```bash
+git revert a1b2c3d
+git push
+```
+
+## 6. Descartar cambios de un archivo
+
+Modificaste un archivo y quieres dejarlo como estaba en el último commit:
+
+```bash
+git restore archivo.ts
+```
+
+¿Lo agregaste con `git add` por error? Lo sacas del staging así:
+
+```bash
+git restore --staged archivo.ts
+```
+
+## 7. `git bisect`: encontrar qué commit rompió todo
+
+Algo funcionaba hace 50 commits y ahora no. ¿Cuál lo rompió? `bisect` hace una búsqueda binaria por ti:
+
+```bash
+git bisect start
+git bisect bad            # el commit actual está roto
+git bisect good v1.0.0    # esta versión funcionaba
+```
+
+Git te va moviendo entre commits y tú solo le dices `git bisect good` o `git bisect bad` según funcione o no. En unos pocos pasos te dice exactamente cuál commit causó el problema. Al terminar:
+
+```bash
+git bisect reset
+```
+
+## 8. Ver quién cambió una línea (y por qué)
+
+```bash
+git blame archivo.ts -L 10,20
+```
+
+Te muestra quién modificó las líneas 10 a 20 y en qué commit. Ideal para entender **por qué** un código está como está... no para culpar a nadie 😅
+
+## Bonus: alias para escribir menos
+
+Agrega esto y escribe `git lg` para ver un historial bonito:
+
+```bash
+git config --global alias.lg "log --oneline --graph --all --decorate"
+```
+
+## Conclusión
+
+Git da miedo hasta que conoces `reflog`. A partir de ahí sabes que casi todo se puede deshacer. Guarda este artículo para el día en que lo necesites (porque ese día **llegará**).
+
+¿Cuál de estos comandos te ha salvado alguna vez? ¿Tienes algún otro favorito? ¡Déjamelo saber!

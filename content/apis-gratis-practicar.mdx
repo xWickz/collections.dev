@@ -1,0 +1,76 @@
+export const meta = {
+  title: "APIs gratis para practicar",
+  description: "¿No sabes qué proyecto hacer? Estas APIs públicas y gratuitas son perfectas para practicar y armar tu portafolio.",
+  category: "recursos",
+  tags: ["api", "recursos", "aprendizaje", "proyectos"],
+  publishedAt: "2026-10-26",
+  published: true,
+  author: "xWickz"
+};
+
+Una de las preguntas más comunes cuando estás aprendiendo es: **"¿qué proyecto hago?"**. La respuesta fácil: busca una API que te guste y construye algo con ella.
+
+Todas estas APIs son **gratis** y la mayoría ni siquiera necesita registro ni API Key. ¡Vamos a por ello!
+
+## Sin registro (copiar y usar)
+
+### JSONPlaceholder
+[JSONPlaceholder](https://jsonplaceholder.typicode.com/) es una API falsa con usuarios, posts, comentarios y tareas. Perfecta para practicar `fetch`, CRUD y paginación sin preocuparte por los datos.
+
+```js
+const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
+const post = await res.json();
+```
+
+**Idea de proyecto:** un mini blog con lista de posts y página de detalle.
+
+### PokéAPI
+[PokéAPI](https://pokeapi.co/) tiene toda la información de Pokémon: tipos, estadísticas, imágenes, evoluciones... Es un clásico por algo.
+
+**Idea de proyecto:** una Pokédex con buscador y filtros por tipo.
+
+### Rick and Morty API
+[Rick and Morty API](https://rickandmortyapi.com/) con personajes, episodios y lugares de la serie. Viene con paginación incluida, ideal para practicar el scroll infinito.
+
+**Idea de proyecto:** una galería de personajes con scroll infinito.
+
+### REST Countries
+[REST Countries](https://restcountries.com/) con información de todos los países: banderas, capitales, población, monedas, idiomas.
+
+**Idea de proyecto:** un juego de adivinar la bandera.
+
+### Open-Meteo
+[Open-Meteo](https://open-meteo.com/) es una API del clima gratuita y sin API Key para uso no comercial. Pronósticos, temperatura, lluvia... todo por coordenadas.
+
+**Idea de proyecto:** una app del clima que use la ubicación del usuario.
+
+### Dog API
+[Dog API](https://dog.ceo/dog-api/) devuelve fotos aleatorias de perros por raza. Simple, pero perfecta para tu primer proyecto con `fetch`.
+
+**Idea de proyecto:** "un perro aleatorio cada vez que presionas un botón".
+
+## Con registro gratuito
+
+### TMDB
+[TMDB](https://developer.themoviedb.org/) tiene información de películas y series: pósters, sinopsis, reparto, valoraciones. Necesitas crear una cuenta para obtener tu API Key.
+
+**Idea de proyecto:** un clon de Netflix o una lista de "películas por ver".
+
+### NASA API
+[NASA API](https://api.nasa.gov/) con la foto astronómica del día, imágenes de Marte y datos de asteroides. Te dan una API Key gratis al instante.
+
+**Idea de proyecto:** un calendario con la foto del espacio de cada día.
+
+## ¿Quieres más?
+
+El repositorio [public-apis](https://github.com/public-apis/public-apis) en GitHub tiene **cientos** de APIs públicas organizadas por categoría: comida, música, deportes, anime, finanzas... Seguro encuentras algo que te apasione.
+
+## Un consejo importante
+
+Si una API necesita API Key, **nunca** la pongas directamente en el código del frontend, porque cualquiera puede verla. Haz la petición desde tu servidor (por ejemplo con una Route Handler o una Server Action en Next.js) y guarda la key en tu `.env`. Hablo más de esto en mi artículo de **Seguridad en Proyectos**.
+
+## Conclusión
+
+El mejor proyecto para tu portafolio es uno que te divierta hacer. Elige una API sobre algo que te guste y empieza: una vez que funcione lo básico, agrégale buscador, filtros, favoritos, modo oscuro... y ya tienes un proyecto completo.
+
+¿Conoces alguna API buena que no esté aquí? ¡Déjamelo saber!

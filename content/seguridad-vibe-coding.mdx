@@ -1,0 +1,138 @@
+export const meta = {
+  title: "Errores de seguridad del vibe-coding",
+  description: "La IA te hace la app en una tarde... y también te deja la base de datos abierta. Los errores más comunes y cómo evitarlos.",
+  category: "web",
+  tags: ["seguridad", "ia", "web", "desarrollo"],
+  publishedAt: "2026-10-26",
+  published: true,
+  author: "xWickz"
+};
+
+En mi artículo de **Seguridad en Proyectos** hablé de lo básico. Hoy vamos con la segunda parte: los errores que veo una y otra vez en apps hechas con **vibe-coding**, es decir, pidiéndole todo a la IA sin revisar mucho el resultado.
+
+La IA genera código que **funciona**, pero que funcione no significa que sea seguro. Veamos los errores más comunes, ¡vamos a por ello!
+
+## 1. API Keys en el frontend
+
+El más común de todos. La IA hace un `fetch` a OpenAI, Stripe o lo que sea directamente desde el componente:
+
+```tsx
+// ❌ Cualquiera puede ver esta key en el navegador
+const res = await fetch("https://api.ejemplo.com/v1/chat", {
+  headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY}` },
+});
+```
+
+En Next.js, **todo lo que empiece con `NEXT_PUBLIC_` termina en el navegador**. Lo mismo pasa con `VITE_` en Vite. Cualquiera abre las DevTools y se lleva tu key (y tu factura).
+
+La solución: haz la petición desde el servidor.
+
+```ts
+// ✅ app/api/chat/route.ts — la key nunca sale del servidor
+export async function POST(request: Request) {
+  const { mensaje } = await request.json();
+  const res = await fetch("https://api.ejemplo.com/v1/chat", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.API_KEY}` },
+    body: JSON.stringify({ mensaje }),
+  });
+  return Response.json(await res.json());
+}
+```
+
+## 2. Base de datos sin reglas de acceso
+
+Si usas **Supabase** o **Firebase**, la base de datos se puede consultar directamente desde el navegador. Eso está bien... **siempre que tengas reglas de acceso**.
+
+Si no activas **Row Level Security (RLS)** en Supabase, cualquiera con tu URL y tu `anon key` (que son públicas) puede leer o borrar **todas** las filas de tus tablas.
+
+```sql
+-- Activa RLS en cada tabla
+alter table posts enable row level security;
+
+-- Cada usuario solo puede ver sus propios posts
+create policy "Ver mis posts" on posts
+  for select using (auth.uid() = user_id);
+```
+
+Regla simple: **ninguna tabla sin RLS.** El panel de Supabase te avisa, ¡no ignores esa advertencia!
+
+## 3. Server Actions sin verificar quién llama
+
+Una Server Action es, en el fondo, un endpoint público. Si no compruebas quién la llama, cualquiera puede ejecutarla:
+
+```ts
+// ❌ Cualquiera puede borrar cualquier post
+"use server";
+export async function borrarPost(id: string) {
+  await db.post.delete({ where: { id } });
+}
+```
+
+```ts
+// ✅ Verifica la sesión y que el post sea del usuario
+"use server";
+export async function borrarPost(id: string) {
+  const session = await auth();
+  if (!session) throw new Error("No autorizado");
+
+  await db.post.delete({ where: { id, authorId: session.user.id } });
+}
+```
+
+Que el botón de "borrar" solo aparezca para el dueño **no** es seguridad. La verificación siempre va en el servidor.
+
+## 4. Paquetes que no existen (slopsquatting)
+
+A veces la IA "alucina" e inventa el nombre de una librería que suena real pero no existe. Los atacantes lo saben: registran esos nombres en npm con código malicioso y esperan a que alguien los instale.
+
+Antes de hacer `npm install` de algo que te sugirió la IA:
+
+- Búscalo en [npmjs.com](https://www.npmjs.com/) y revisa sus **descargas semanales** y su repositorio.
+- Desconfía de paquetes con pocas descargas, creados hace poco o sin repositorio.
+
+## 5. Sin límite de peticiones
+
+Tu endpoint de login, de registro o el que llama a una IA de pago no tiene ningún límite. Alguien hace un script que lo llama 10.000 veces por minuto y... adiós a tu presupuesto (o hola a los ataques de fuerza bruta).
+
+Agrega **rate limiting**, por ejemplo con [Upstash Ratelimit](https://github.com/upstash/ratelimit-js) o el firewall de tu proveedor de hosting. Como mínimo, en los endpoints de autenticación y en los que cuestan dinero.
+
+## 6. Confiar en los datos del cliente
+
+La IA suele confiar en lo que llega del formulario. Por ejemplo, recibir el precio desde el frontend en un checkout:
+
+```ts
+// ❌ El usuario puede cambiar el precio desde las DevTools
+const { productoId, precio } = await request.json();
+await cobrar(precio);
+```
+
+```ts
+// ✅ El precio siempre se busca en el servidor
+const { productoId } = await request.json();
+const producto = await db.producto.findUnique({ where: { id: productoId } });
+await cobrar(producto.precio);
+```
+
+Y valida siempre la forma de los datos con algo como **Zod** antes de usarlos.
+
+## 7. El `.env` subido a GitHub
+
+Clásico. Verifica que tu `.gitignore` tenga:
+
+```bash
+.env
+.env*.local
+```
+
+Si ya subiste una key alguna vez, **bórrala del archivo no es suficiente**: sigue en el historial de Git. Tienes que **revocarla y generar una nueva** en el panel del servicio.
+
+## Un truco: pídele a la IA que se revise
+
+Cuando termines una funcionalidad, pídele a tu herramienta de IA algo como: *"Revisa este código buscando problemas de seguridad: keys expuestas, endpoints sin autenticación, falta de validación y datos del cliente en los que se confía"*. No reemplaza una revisión de verdad, pero atrapa muchos de estos errores.
+
+## Conclusión
+
+El vibe-coding es genial para avanzar rápido, pero la seguridad no se puede delegar a ciegas. Con revisar estos 7 puntos antes de publicar, ya estás por delante de la mayoría de apps hechas con IA.
+
+¿Te ha pasado alguno de estos? ¿Conoces otro error común? ¡Déjamelo saber!
