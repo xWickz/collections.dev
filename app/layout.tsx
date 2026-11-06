@@ -19,8 +19,7 @@ const pixelGrid = GeistPixelGrid;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://collections.wickz.dev"),
-  title:
-    "collections.dev | Recolección de artículos y recursos sobre desarrollo web",
+  title: "collections.dev | Artículos y recursos de desarrollo web",
   description:
     "collections.dev es una plataforma dedicada a recopilar artículos, recursos y herramientas relacionadas al desarrollo web.",
   keywords: [
@@ -62,11 +61,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_ES",
     url: "https://collections.wickz.dev",
-    title:
-      "collections.dev | Recolección de artículos y recursos sobre desarrollo web",
+    title: "collections.dev | Artículos y recursos de desarrollo web",
     description:
       "collections.dev es una plataforma dedicada a recopilar artículos, recursos y herramientas relacionadas al desarrollo web.",
     siteName: "collections.dev",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 
   robots: {
@@ -82,7 +83,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} ${pixelGrid.variable} h-full antialiased `}
     >
       <body className="min-h-screen flex flex-col bg-[#0b0b0b]">

@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import Hero from "@/components/Hero";
 import LatestArticles, {
   LatestArticlesSkeleton,
 } from "@/components/LatestArticles";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 export default async function HomePage({
   searchParams,
 }: {

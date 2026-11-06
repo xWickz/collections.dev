@@ -4,8 +4,20 @@ import Container from "@/components/ui/container";
 import { getAllArticles } from "@/lib/mdx";
 
 export const metadata: Metadata = {
-  title: "Articulos | collections.dev",
-  description: "Specific page description",
+  title: "Artículos | collections.dev",
+  description:
+    "Guías y artículos sobre desarrollo web: React, Next.js, CSS, Git, herramientas y más.",
+  alternates: { canonical: "/articles" },
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: "/articles",
+    title: "Artículos | collections.dev",
+    description:
+      "Guías y artículos sobre desarrollo web: React, Next.js, CSS, Git, herramientas y más.",
+    siteName: "collections.dev",
+    images: "/opengraph-image",
+  },
 };
 
 type ArticlesPageProps = {
@@ -25,7 +37,7 @@ export default async function ArticlesPage({
       <Container>
         <header className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-white">
-            Articulos
+            Artículos de desarrollo web
           </h1>
         </header>
 
@@ -36,7 +48,7 @@ export default async function ArticlesPage({
             ))}
           </div>
         ) : (
-          <p className="text-zinc-500">No se encontraron articulos.</p>
+          <p className="text-zinc-500">No se encontraron artículos.</p>
         )}
       </Container>
     </main>
