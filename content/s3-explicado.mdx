@@ -1,0 +1,286 @@
+export const meta = {
+  title: "AWS S3 explicado: qué es y cuándo conviene usarlo",
+  description: "Todos hablan de S3, pero ¿para qué sirve y cuándo lo necesitas de verdad? Te lo explico fácil, con un ejemplo real en TypeScript y Next.js.",
+  category: "web",
+  tags: ["aws", "s3", "nextjs", "typescript"],
+  publishedAt: "2026-11-06",
+  published: true,
+  author: "xWickz"
+};
+
+Tu app ya funciona y tus usuarios quieren subir fotos. La primera idea suele ser guardarlas en una carpeta del servidor, y al principio funciona. Hasta que el disco se llena, cambias de servidor o levantas un segundo servidor que no ve esas fotos.
+
+Ese es el problema que resuelve **Amazon S3**. En esta guía vamos a ver qué es, cuándo te conviene y cuándo no, y cómo subir archivos desde **Next.js** con **TypeScript**. ¡Vamos a por ello!
+
+## ¿Qué es S3?
+
+**S3** es un servicio de AWS para guardar archivos en la nube. Tú le entregas un archivo con un nombre y, cuando lo necesitas, se lo pides con ese mismo nombre.
+
+Solo necesitas tres conceptos:
+
+- **Bucket:** tu espacio de almacenamiento, por ejemplo `mi-app-fotos`.
+- **Clave (key):** el nombre único del archivo, por ejemplo `avatars/ana.jpg`.
+- **Objeto:** el archivo en sí, junto con sus datos, como el tipo de archivo.
+
+Lo que más confunde al empezar: **S3 no tiene carpetas de verdad**. En `avatars/ana.jpg`, el `avatars/` es parte del nombre. La consola de AWS lo muestra como una carpeta para que sea más cómodo, pero por dentro es una lista de claves que apuntan a archivos.
+
+Tampoco puedes editar un pedazo de un objeto. Si cambias algo, subes el archivo completo otra vez. Por eso S3 va muy bien para archivos que guardas y lees, y mal para archivos que modificas a cada rato.
+
+## ¿Qué ganas al usarlo?
+
+- **Espacio sin administrar discos:** el almacenamiento crece con lo que subas.
+- **Tus archivos están bien protegidos:** S3 guarda copias redundantes y está diseñado para una durabilidad del 99.999999999%.
+- **Tu servidor trabaja menos:** los usuarios pueden subir y descargar directo desde S3.
+- **Pagas por lo que usas:** no contratas un tamaño fijo de disco.
+
+## ¿Y por qué no quedarme con lo gratis?
+
+Los planes gratis están muy bien para empezar, y si tu proyecto cabe en ellos, **quédate ahí**. Estos son los límites que suelen aparecer primero (revisados en noviembre de 2026):
+
+- **Vercel Functions:** el cuerpo de una petición tiene un máximo de **4.5 MB** en cualquier plan. Una foto de un móvil o un video puede pasarse.
+- **Vercel Blob en Hobby:** incluye 1 GB de almacenamiento y 10 GB de transferencia. Si superas el límite, no podrás usar Blob hasta que pasen 30 días.
+- **Vercel Hobby:** es solo para uso personal, no comercial.
+- **Supabase Free:** incluye 1 GB de archivos y 5 GB de transferencia, con un máximo de 50 MB por archivo. El proyecto se pausa tras una semana sin actividad.
+
+Siendo justos, Vercel Blob y Supabase Storage también permiten subir archivos sin pasar por tu función, y sus planes de pago suben estos límites. S3 no es la única salida. Te conviene cuando quieres más control, tu volumen crece o ya trabajas dentro de AWS.
+
+## Cómo funciona una subida bien hecha
+
+Lo más tentador es enviar el archivo a tu backend y que él lo reenvíe a S3. Pero así chocas con el límite de 4.5 MB y tu servidor carga con todo el trabajo.
+
+La mejor forma es usar una **URL prefirmada**, que es un link temporal con permiso para hacer una sola tarea:
+
+1. El navegador le dice a tu backend qué archivo quiere subir.
+2. Tu backend revisa quién es el usuario y si el archivo es válido.
+3. Tu backend crea un link que dura 60 segundos.
+4. El navegador sube el archivo directo a S3 con ese link.
+
+Tu backend da el permiso, pero el archivo no pasa por él.
+
+## Preparar AWS
+
+### 1. Crea el bucket
+
+En la consola de AWS, entra a **S3** y crea un bucket. Deja activado **Block all public access**: los buckets nuevos no permiten acceso público por defecto, y así debe seguir.
+
+### 2. Crea un usuario con pocos permisos
+
+En **IAM**, crea un usuario para tu app y dale solo lo que necesita. Cambia `mi-app-fotos` por el nombre de tu bucket:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject"],
+      "Resource": "arn:aws:s3:::mi-app-fotos/*"
+    }
+  ]
+}
+```
+
+### 3. Configura CORS
+
+Como el navegador va a hablar directo con S3, el bucket tiene que aceptar peticiones de tu sitio. Si no, el navegador bloqueará la subida. En tu bucket, entra a **Permissions** y pega esto en **CORS**:
+
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["PUT"],
+    "AllowedOrigins": ["https://tu-sitio.com"],
+    "ExposeHeaders": []
+  }
+]
+```
+
+Mientras desarrollas, agrega también `http://localhost:3000` en `AllowedOrigins`.
+
+### 4. Agrega las variables de entorno
+
+Crea las claves de acceso de ese usuario y colócalas en tu **.env.local**:
+
+```bash
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=tu-access-key
+AWS_SECRET_ACCESS_KEY=tu-secret-key
+S3_BUCKET=mi-app-fotos
+```
+
+⚠️ *Estas variables nunca deben llevar el prefijo `NEXT_PUBLIC_`, porque terminarían en el navegador.*
+
+## Subir una foto desde Next.js
+
+Primero instalamos las dependencias:
+
+```bash
+pnpm add @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+```
+
+Creamos el cliente de S3 en `lib/s3.ts`:
+
+```ts
+import { S3Client } from "@aws-sdk/client-s3";
+
+export const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  requestChecksumCalculation: "WHEN_REQUIRED",
+});
+```
+
+Esa última línea es importante. Sin ella, el SDK agrega al link un checksum calculado antes de conocer tu archivo, y eso puede hacer que la subida falle.
+
+Ahora creamos la ruta que entrega el link en `app/api/upload/route.ts`. Cambia `auth` por la función de login que uses en tu proyecto:
+
+```ts
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { auth } from "@/lib/auth";
+import { s3 } from "@/lib/s3";
+
+const EXTENSIONES = new Map([
+  ["image/jpeg", "jpg"],
+  ["image/png", "png"],
+  ["image/webp", "webp"],
+]);
+const TAMANO_MAXIMO = 5 * 1024 * 1024; // 5 MB
+
+export async function POST(request: Request) {
+  const usuario = await auth();
+  if (!usuario) {
+    return Response.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  const { type, size } = await request.json();
+  const extension = EXTENSIONES.get(type);
+
+  if (!extension) {
+    return Response.json({ error: "Formato no permitido" }, { status: 400 });
+  }
+  if (!Number.isInteger(size) || size <= 0 || size > TAMANO_MAXIMO) {
+    return Response.json({ error: "Tamaño no permitido" }, { status: 400 });
+  }
+
+  const key = `avatars/${usuario.id}/${crypto.randomUUID()}.${extension}`;
+  const url = await getSignedUrl(
+    s3,
+    new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET,
+      Key: key,
+      ContentType: type,
+      ContentLength: size,
+    }),
+    {
+      expiresIn: 60,
+      signableHeaders: new Set(["content-type", "content-length"]),
+    },
+  );
+
+  return Response.json({ url, key });
+}
+```
+
+Aquí hay tres detalles que te ahorran problemas:
+
+- **`crypto.randomUUID()`:** evita que dos archivos tengan la misma clave. Si repites una clave, S3 reemplaza el archivo anterior.
+- **`ContentLength`:** hace que el link solo sirva para un archivo de ese tamaño exacto.
+- **`signableHeaders`:** hace que el link también exija ese tipo de archivo. Sin esto, S3 no valida el `Content-Type`.
+
+Por último, creamos el componente que sube la foto en `components/subir-foto.tsx`:
+
+```tsx
+"use client";
+
+import type { ChangeEvent } from "react";
+
+export function SubirFoto() {
+  async function subir(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const respuesta = await fetch("/api/upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: file.type, size: file.size }),
+    });
+    if (!respuesta.ok) throw new Error("No se pudo preparar la subida");
+
+    const { url, key } = await respuesta.json();
+
+    const subida = await fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+    if (!subida.ok) throw new Error("No se pudo subir la foto");
+
+    console.log("Guarda esta clave en tu base de datos:", key);
+  }
+
+  return (
+    <input
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      onChange={subir}
+    />
+  );
+}
+```
+
+Fíjate en el final: **guarda la clave en tu base de datos**, junto al usuario. La base de datos recuerda de quién es cada foto y S3 guarda el archivo.
+
+## Mostrar una foto privada
+
+Como el bucket es privado, para mostrar una foto también creamos un link temporal. El permiso `s3:GetObject` ya lo dimos antes, así que solo necesitas esta función en tu servidor:
+
+```ts
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { s3 } from "@/lib/s3";
+
+export function obtenerUrlDeFoto(key: string) {
+  return getSignedUrl(
+    s3,
+    new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }),
+    { expiresIn: 300 },
+  );
+}
+```
+
+Antes de llamarla, revisa que el usuario pueda ver esa foto. Quien tenga el link podrá abrirla hasta que expire, en este caso durante 5 minutos.
+
+## ¿Cuánto cuesta?
+
+S3 no cobra solo por lo que guardas. Tu factura depende de:
+
+- **Almacenamiento:** los GB que guardas cada mes.
+- **Peticiones:** cada subida, descarga o listado.
+- **Transferencia de salida:** lo que se descarga desde S3 hacia internet.
+
+Lo que suele sorprender es la **transferencia**. Guardar un video de 1 GB puede salir barato, pero si miles de personas lo descargan, la cuenta cambia. Los precios varían por región, así que calcula tu caso con la [página de precios de S3](https://aws.amazon.com/s3/pricing/) y crea una alerta en **AWS Budgets** desde el primer día.
+
+También puedes ahorrar con **reglas de ciclo de vida**, que borran archivos o los mueven a clases de almacenamiento más baratas con el tiempo. Son ideales para logs y backups viejos.
+
+## ¿Cuándo sí usar S3?
+
+- Fotos, videos y documentos que suben tus usuarios.
+- Backups y logs.
+- Archivos grandes o un volumen que no deja de crecer.
+- Archivos que varios servidores necesitan compartir.
+
+## ¿Cuándo no usarlo?
+
+- **Datos que filtras o consultas:** usuarios, pedidos o productos van en una base de datos.
+- **Archivos que editas a cada rato:** cada cambio reescribe el objeto completo.
+- **Unos pocos assets fijos:** el logo de tu sitio puede vivir en `public/`.
+- **El disco de un servidor o una base de datos en marcha:** para eso existe el almacenamiento en bloque, como **EBS**.
+- **Un proyecto pequeño:** si cabes en un plan gratis, no agregues AWS antes de tiempo.
+
+Si lo que más te preocupa es la transferencia, mira también **Cloudflare R2**. Es compatible con la API de S3 y [no cobra por la transferencia de salida](https://developers.cloudflare.com/r2/pricing/), aunque sí por almacenamiento y operaciones.
+
+## Antes de irte
+
+Si te quedas con una sola idea, que sea esta: **tu base de datos guarda la información y S3 guarda los archivos**.
+
+No necesitas S3 desde el primer día. Pero cuando tus archivos empiecen a pesar, crecer o costarte problemas, ya sabes qué hace y cómo usarlo. ¡Nos vemos en la próxima guía!
