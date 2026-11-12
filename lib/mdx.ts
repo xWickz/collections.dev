@@ -61,6 +61,7 @@ export const getAllArticles = cache(
         return {
           slug,
           ...meta,
+          tags: [...new Set(meta.tags)],
         };
       })
       .filter((article): article is ArticleListItem => article !== null);

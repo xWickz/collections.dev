@@ -18,7 +18,7 @@ export default async function HomePage({
 }) {
   return (
     <main className="bg-background flex flex-col justify-center">
-      <div className="mx-auto w-full max-w-5xl px-4 py-12">
+      <div className="mx-auto w-full max-w-7xl px-4 py-12">
         <Hero />
         <Suspense fallback={<LatestArticlesSkeleton />}>
           <LatestArticles source={getAllArticles} searchParams={searchParams} />

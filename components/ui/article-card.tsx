@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDate } from "@/lib/categories";
 import type { ArticleListItem } from "@/types/article";
 
 type Props = {
@@ -9,6 +10,9 @@ export default function ArticleCard({ article }: Props) {
   return (
     <article className="flex flex-col h-full rounded-md border border-foreground/20 bg-foreground/5 p-5 font-pixel">
       <div className="grow">
+        <p className="mb-1 text-xs text-foreground/60">
+          {formatDate(article.publishedAt)}
+        </p>
         <h2 className="mb-0.5 text-xl font-semibold text-foreground tracking-tight">
           <Link href={`/articles/${article.slug}`} className="hover:underline">
             {article.title.replace("| collections.dev", "")}
