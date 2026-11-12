@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ArticleCard from "@/components/ui/article-card";
 import Container from "@/components/ui/container";
+import type { SearchParams } from "@/lib/definitions";
 import { getAllArticles } from "@/lib/mdx";
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 type ArticlesPageProps = {
-  searchParams?: Promise<{ query?: string; type?: string }>;
+  searchParams?: Promise<SearchParams>;
 };
 
 export default async function ArticlesPage({
@@ -33,10 +34,10 @@ export default async function ArticlesPage({
   const articles = await getAllArticles(query, type);
 
   return (
-    <main className="py-12 font-sans bg-void-eclipse">
+    <main className="py-12 font-sans bg-background">
       <Container>
         <header className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight text-white">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">
             Artículos de desarrollo web
           </h1>
         </header>
@@ -48,7 +49,7 @@ export default async function ArticlesPage({
             ))}
           </div>
         ) : (
-          <p className="text-zinc-500">No se encontraron artículos.</p>
+          <p className="text-foreground/60">No se encontraron artículos.</p>
         )}
       </Container>
     </main>

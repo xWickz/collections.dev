@@ -99,10 +99,10 @@ export default function ClientTranslator({
   };
 
   return (
-    <div className="fixed bottom-4 right-4 bg-zinc-900 border border-white/10 p-4 rounded-lg text-xs shadow-xl flex flex-col gap-2 max-w-xs">
-      <p className="text-zinc-400">{status}</p>
+    <div className="fixed bottom-4 right-4 bg-background border border-foreground/10 p-4 rounded-lg text-xs shadow-xl flex flex-col gap-2 max-w-xs">
+      <p className="text-foreground/70">{status}</p>
       {downloadProgress !== null && (
-        <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+        <div className="w-full bg-foreground/10 h-1.5 rounded-full overflow-hidden">
           <div
             className="bg-accent-blue h-full transition-all duration-300"
             style={{ width: `${downloadProgress}%` }}
@@ -113,7 +113,7 @@ export default function ClientTranslator({
         <button
           type="button"
           onClick={handleTranslate}
-          className="mt-1 px-3 py-1.5 bg-white text-black rounded hover:bg-zinc-200 transition-colors w-full cursor-pointer font-sans"
+          className="mt-1 px-3 py-1.5 bg-foreground text-background rounded hover:bg-foreground/80 transition-colors w-full cursor-pointer font-sans"
         >
           Traducir artículo al inglés
         </button>

@@ -1,3 +1,5 @@
+import type { ArticleListItem as ListItem } from "@/types/article";
+
 export type NavbarItems = {
   readonly name: string;
   readonly link: string;
@@ -16,3 +18,10 @@ export type ArticleMeta = {
 export type ArticleListItem = ArticleMeta & {
   slug: string;
 };
+
+export type SearchParams = { query?: string; type?: string };
+
+export type ArticleSource = (
+  query?: string,
+  type?: string,
+) => Promise<ListItem[]>;

@@ -84,9 +84,18 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${pixelGrid.variable} h-full antialiased `}
     >
-      <body className="min-h-screen flex flex-col bg-[#0b0b0b]">
+      <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: aplica el tema guardado antes de pintar para evitar parpadeo
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`,
+          }}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

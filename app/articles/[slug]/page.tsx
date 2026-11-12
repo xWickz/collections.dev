@@ -70,14 +70,14 @@ export default async function ArticlePage({ params }: PageProps) {
   });
 
   return (
-    <main className="py-12 bg-void-eclipse text-snow-white min-h-screen">
+    <main className="py-12 bg-background text-foreground min-h-screen">
       <Container>
         <article className="prose prose-invert max-w-none font-sans">
-          <header className="mb-10 border-b border-white/10 pb-6">
-            <p className="mb-1 text-sm uppercase tracking-tight text-zinc-500 text-center">
+          <header className="mb-10 border-b border-foreground/10 pb-6">
+            <p className="mb-1 text-sm uppercase tracking-tight text-foreground/60 text-center">
               <Link
                 href={`/articles?type=category&query=${encodeURIComponent(meta.category)}`}
-                className="hover:text-zinc-300 transition-colors"
+                className="hover:text-foreground/80 transition-colors"
               >
                 {meta.category}
               </Link>
@@ -85,10 +85,10 @@ export default async function ArticlePage({ params }: PageProps) {
             <h1 className="text-5xl font-bold tracking-tight text-center">
               {meta.title.replace("| collections.dev", "")}
             </h1>
-            <p className="text-snow-white/90 text-center text-md font-medium mt-4">
+            <p className="text-foreground/90 text-center text-md font-medium mt-4">
               {meta.description}
             </p>
-            <p className="mt-5 -mb-4 text-zinc-400 text-sm">
+            <p className="mt-5 -mb-4 text-foreground/70 text-sm">
               {meta.author && (
                 <Image
                   src={`https://avatars.githubusercontent.com/${encodeURIComponent(meta.author)}?s=32&v=4`}

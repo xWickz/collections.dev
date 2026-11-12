@@ -23,14 +23,14 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <>
         <h1
           {...props}
-          className="mb-6 mt-10 text-4xl font-bold tracking-tight border-b border-white/10 pb-2"
+          className="mb-6 mt-10 text-4xl font-bold tracking-tight border-b border-foreground/10 pb-2"
         />
       </>
     ),
     h2: (props: React.HTMLAttributes<HTMLElement>) => (
       <h2
         {...props}
-        className="mb-2 mt-10 text-2xl font-semibold border-b border-white/10 pb-3"
+        className="mb-2 mt-10 text-2xl font-semibold border-b border-foreground/10 pb-3"
       />
     ),
     h3: (props: React.HTMLAttributes<HTMLElement>) => (
@@ -48,7 +48,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     a: (props: React.HTMLAttributes<HTMLAnchorElement>) => (
       <a
         {...props}
-        className="text-cyan-400 underline underline-offset-4 hover:text-cyan-300"
+        className="text-link underline underline-offset-4 hover:text-link/80"
       />
     ),
     code: Code,

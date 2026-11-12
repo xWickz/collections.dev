@@ -1,6 +1,6 @@
 import ArticleCard from "@/components/ui/article-card";
 import SkeletonArticleCard from "@/components/ui/SkeletonArticleCard";
-import { getAllArticles } from "@/lib/mdx";
+import type { ArticleSource, SearchParams } from "@/lib/definitions";
 
 const MAX_ARTICLES: Readonly<number> = 10;
 const SKELETON_IDS = [
@@ -15,7 +15,7 @@ const SKELETON_IDS = [
 export function LatestArticlesSkeleton() {
   return (
     <section aria-busy="true" aria-label="Cargando últimos artículos">
-      <div className="mt-8 mb-6 h-8 w-56 animate-pulse rounded bg-white/10" />
+      <div className="mt-8 mb-6 h-8 w-56 animate-pulse rounded bg-foreground/10" />
       <div className="grid gap-4 md:grid-cols-2">
         {SKELETON_IDS.map((id) => (
           <SkeletonArticleCard key={id} />
@@ -26,17 +26,20 @@ export function LatestArticlesSkeleton() {
 }
 
 export default async function LatestArticles({
+  source,
   searchParams,
 }: {
-  searchParams?: Promise<{ query?: string; type?: string }>;
+  source: ArticleSource;
+  searchParams?: Promise<SearchParams>;
 }) {
-  const type = (await searchParams)?.type || "articles";
-  const query = (await searchParams)?.query || "";
+  const params = await searchParams;
+  const type = params?.type || "articles";
+  const query = params?.query || "";
 
-  const articles = (await getAllArticles(query, type)).slice(0, MAX_ARTICLES);
+  const articles = (await source(query, type)).slice(0, MAX_ARTICLES);
   return (
     <>
-      <h2 className="text-2xl font-semibold text-snow-white mt-8 mb-6 tracking-tight font-pixel">
+      <h2 className="text-2xl font-semibold text-foreground mt-8 mb-6 tracking-tight font-pixel">
         Últimos artículos
       </h2>
       <div className="grid gap-4 md:grid-cols-2">
@@ -45,7 +48,7 @@ export default async function LatestArticles({
             <ArticleCard key={article.slug} article={article} />
           ))
         ) : (
-          <p className="text-zinc-500">No se encontraron artículos.</p>
+          <p className="text-foreground/60">No se encontraron artículos.</p>
         )}
       </div>
     </>
