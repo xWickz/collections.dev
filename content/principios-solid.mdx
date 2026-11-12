@@ -1,0 +1,270 @@
+export const meta = {
+  title: "Principios SOLID: diseña código que aguante cualquier cambio",
+  description: "Los 5 principios SOLID explicados fácil, con ejemplos en TypeScript. Aprende a estructurar tu código para que cambiar una pieza no rompa todo lo demás.",
+  category: "web",
+  tags: ["solid", "typescript", "buenas-practicas", "arquitectura"],
+  publishedAt: "2026-11-12",
+  published: true,
+  author: "xWickz"
+};
+
+El 12 de noviembre de 2026, NVIDIA [anunció](https://nvidianews.nvidia.com/news/nvidia-announces-ceo-transition) que Jensen Huang dejaba el cargo de CEO con efecto inmediato. El consejo dijo que se espera que las operaciones, los compromisos con clientes y la hoja de ruta de producto continúen **sin interrupción**.
+
+Dejemos la noticia ahí, porque lo interesante es la idea: una pieza clave se va y el sistema sigue funcionando. Eso mismo es lo que queremos en nuestro código. Que cuando cambies un proveedor, una regla de negocio o la persona que mantiene un módulo, no se caiga todo.
+
+Para eso existen los **principios SOLID**. En esta guía vamos a ver los cinco con ejemplos en **TypeScript**, y también cuándo *no* conviene aplicarlos. ¡Vamos a por ello!
+
+## ¿Qué es SOLID?
+
+**SOLID** es un conjunto de cinco principios de diseño orientado a objetos. Cada letra es la inicial de uno:
+
+- **S**: Single Responsibility (responsabilidad única)
+- **O**: Open/Closed (abierto/cerrado)
+- **L**: Liskov Substitution (sustitución de Liskov)
+- **I**: Interface Segregation (segregación de interfaces)
+- **D**: Dependency Inversion (inversión de dependencias)
+
+No se trata de memorizar las letras. Cada principio intenta evitar un problema concreto, y entender ese problema es lo que de verdad te sirve.
+
+## ¿Por qué importan?
+
+Un proyecto casi siempre empieza funcionando bien. Los problemas aparecen cuando crece:
+
+- Clases que hacen demasiadas cosas.
+- Cambios en un lugar que rompen otro lugar que no tenía nada que ver.
+- Código que no puedes reutilizar porque está pegado a todo.
+- Funcionalidades nuevas que cada vez cuestan más.
+
+Hoy una IA puede generarte código en segundos, pero **tú** necesitas saber si esa solución está bien diseñada. SOLID te da un criterio para juzgarlo.
+
+## S: Single Responsibility
+
+> Una clase debería tener una sola razón para cambiar.
+
+Si una clase hace varias cosas, cada una de ellas es un motivo para tocarla, y cada vez que la tocas arriesgas romper las demás.
+
+```ts
+// Mal: tres razones para cambiar
+class Pedido {
+  cobrar() { /* habla con la pasarela de pago */ }
+  enviarEmail() { /* arma y envía el correo */ }
+  generarPDF() { /* dibuja la factura */ }
+}
+```
+
+Si mañana cambia la pasarela, el diseño del correo o el formato de la factura, tienes que abrir la misma clase. Lo correcto es separar cada responsabilidad:
+
+```ts
+class Cobros {
+  cobrar(pedido: Pedido) { /* ... */ }
+}
+
+class Notificador {
+  enviar(pedido: Pedido) { /* ... */ }
+}
+
+class FacturaPDF {
+  generar(pedido: Pedido) { /* ... */ }
+}
+```
+
+Ahora cada cambio toca un solo archivo. Ojo, "una responsabilidad" no significa "un método": significa un solo motivo para cambiar.
+
+## O: Open/Closed
+
+> Abierto para extender, cerrado para modificar.
+
+Quieres poder agregar comportamiento nuevo sin editar el código que ya funciona. La señal de alarma es un `if/else` o un `switch` que crece con cada caso nuevo:
+
+```ts
+// Mal: cada campaña nueva obliga a editar esta función
+function aplicarDescuento(tipo: string, precio: number) {
+  if (tipo === "navidad") return precio * 0.9;
+  if (tipo === "vip") return precio * 0.8;
+  return precio;
+}
+```
+
+Con un contrato común, cada descuento es una pieza independiente:
+
+```ts
+interface Descuento {
+  aplicar(precio: number): number;
+}
+
+class DescuentoNavidad implements Descuento {
+  aplicar(precio: number) {
+    return precio * 0.9;
+  }
+}
+
+class DescuentoVIP implements Descuento {
+  aplicar(precio: number) {
+    return precio * 0.8;
+  }
+}
+
+function total(precio: number, descuento: Descuento) {
+  return descuento.aplicar(precio);
+}
+```
+
+Para agregar el descuento del Black Friday creas una clase nueva. `total` no se toca, y no hay riesgo de romper lo que ya funcionaba.
+
+## L: Liskov Substitution
+
+> Donde uses una clase base, debería funcionar cualquiera de sus hijas sin sorpresas.
+
+Si una subclase no puede cumplir lo que promete la clase padre, la jerarquía está mal pensada. El ejemplo clásico:
+
+```ts
+class Pato {
+  volar() {
+    console.log("Volando");
+  }
+}
+
+class PatoDeGoma extends Pato {
+  volar() {
+    throw new Error("Los patos de goma no vuelan");
+  }
+}
+
+function lanzarAlCielo(pato: Pato) {
+  pato.volar(); // revienta si le pasas un PatoDeGoma
+}
+```
+
+`lanzarAlCielo` espera cualquier `Pato`, pero con un `PatoDeGoma` explota. El problema no es el pato de goma, es que `volar()` no debía estar en la clase base. La solución es modelar mejor las capacidades:
+
+```ts
+interface Volador {
+  volar(): void;
+}
+
+class PatoReal implements Volador {
+  volar() {
+    console.log("Volando");
+  }
+}
+
+class PatoDeGoma {
+  flotar() {
+    console.log("Flotando");
+  }
+}
+```
+
+La regla práctica: si al sustituir una clase tienes que preguntar "¿qué tipo eres?" o lanzar errores de "no soportado", algo falló en el diseño.
+
+## I: Interface Segregation
+
+> Nadie debería depender de métodos que no usa.
+
+Una interfaz gigante obliga a las clases a implementar cosas que no necesitan:
+
+```ts
+// Mal: ¿por qué una impresora simple tendría que escanear?
+interface Multifuncion {
+  imprimir(doc: string): void;
+  escanear(): string;
+  enviarFax(doc: string): void;
+}
+```
+
+Es mejor dividirla en interfaces pequeñas y específicas, y que cada clase implemente solo las que le corresponden:
+
+```ts
+interface Imprimible {
+  imprimir(doc: string): void;
+}
+
+interface Escaneable {
+  escanear(): string;
+}
+
+interface Enviable {
+  enviarFax(doc: string): void;
+}
+
+class ImpresoraBasica implements Imprimible {
+  imprimir(doc: string) { /* ... */ }
+}
+
+class ImpresoraPro implements Imprimible, Escaneable, Enviable {
+  imprimir(doc: string) { /* ... */ }
+  escanear() { return ""; }
+  enviarFax(doc: string) { /* ... */ }
+}
+```
+
+En TypeScript esto es muy natural porque las interfaces cuestan casi nada. Cada función puede pedir exactamente lo que necesita y nada más.
+
+## D: Dependency Inversion
+
+> Depende de abstracciones, no de implementaciones concretas.
+
+Imagina que tu lógica de alertas llama directamente a un proveedor de SMS:
+
+```ts
+// Mal: la lógica está casada con Twilio
+class Alertas {
+  private sms = new TwilioClient();
+
+  avisar(mensaje: string) {
+    this.sms.enviar(mensaje);
+  }
+}
+```
+
+Si mañana cambias de proveedor, tienes que editar la lógica. Peor aún, no puedes probarla sin mandar un SMS de verdad. Al invertir la dependencia, la clase pide una abstracción y alguien de fuera le da la implementación:
+
+```ts
+interface Notificador {
+  enviar(mensaje: string): void;
+}
+
+class Alertas {
+  constructor(private canal: Notificador) {}
+
+  avisar(mensaje: string) {
+    this.canal.enviar(mensaje);
+  }
+}
+
+class SmsTwilio implements Notificador {
+  enviar(mensaje: string) { /* ... */ }
+}
+
+class EmailSES implements Notificador {
+  enviar(mensaje: string) { /* ... */ }
+}
+
+const alertas = new Alertas(new SmsTwilio());
+```
+
+Cambiar de proveedor es cambiar una línea al crear `Alertas`. Para los tests, pasas un `Notificador` falso y ya. Este es el principio que más se parece al caso de NVIDIA: la lógica no depende de una pieza concreta, así que esa pieza puede cambiar.
+
+## Los 5 en una línea
+
+- **S:** una sola razón para cambiar.
+- **O:** extiende sin modificar lo existente.
+- **L:** las sustituciones no deben romper lo que se espera.
+- **I:** interfaces pequeñas y específicas.
+- **D:** depende de abstracciones, no de implementaciones.
+
+## Cuándo NO aplicarlos
+
+Este es el error más común: tomarse SOLID como una obligación y crear 40 interfaces para un CRUD de tres campos.
+
+- Si solo hay **una** implementación y no hay señales de que vaya a haber otra, no necesitas una interfaz todavía. Puedes extraerla el día que la necesites.
+- Si el código nunca cambia (un script de una sola vez, un prototipo), la estructura extra es peso muerto.
+- Más clases no es mejor diseño. Si para entender un flujo tienes que saltar entre ocho archivos, te pasaste.
+
+Una buena regla: aplica un principio cuando sientas el dolor que intenta evitar, no antes.
+
+## Conclusión
+
+SOLID no hace tu software perfecto. Lo que hace es ayudarte a tomar mejores decisiones cuando un proyecto empieza a crecer. Diseñar bien no es solo que funcione hoy, también es que puedas cambiarlo mañana sin miedo.
+
+La próxima vez que tengas que tocar un archivo y te dé nervios, pregúntate cuál de los cinco principios estás incumpliendo. Casi siempre hay uno. ¡Hasta la próxima!
