@@ -17,13 +17,13 @@ export default async function HomePage({
   searchParams?: Promise<SearchParams>;
 }) {
   return (
-    <main className="bg-background flex flex-col justify-center">
+    <div className="bg-background flex flex-col justify-center">
       <div className="mx-auto w-full max-w-7xl px-4 py-12">
         <Hero />
         <Suspense fallback={<LatestArticlesSkeleton />}>
           <LatestArticles source={getAllArticles} searchParams={searchParams} />
         </Suspense>
       </div>
-    </main>
+    </div>
   );
 }

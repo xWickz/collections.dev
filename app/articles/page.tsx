@@ -4,7 +4,7 @@ import Container from "@/components/ui/container";
 import type { SearchParams } from "@/lib/definitions";
 import { getAllArticles } from "@/lib/mdx";
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: "Artículos | collections.dev",
   description:
     "Guías y artículos sobre desarrollo web: React, Next.js, CSS, Git, herramientas y más.",
@@ -21,6 +21,16 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateMetadata({
+  searchParams,
+}: ArticlesPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  // Vistas filtradas/buscadas: contenido duplicado, no indexar
+  return params?.query
+    ? { ...baseMetadata, robots: { index: false } }
+    : baseMetadata;
+}
+
 type ArticlesPageProps = {
   searchParams?: Promise<SearchParams>;
 };
@@ -34,7 +44,7 @@ export default async function ArticlesPage({
   const articles = await getAllArticles(query, type);
 
   return (
-    <main className="py-12 font-sans bg-background">
+    <div className="py-12 font-sans bg-background">
       <Container>
         <header className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
@@ -52,6 +62,6 @@ export default async function ArticlesPage({
           <p className="text-foreground/60">No se encontraron artículos.</p>
         )}
       </Container>
-    </main>
+    </div>
   );
 }

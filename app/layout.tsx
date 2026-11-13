@@ -19,42 +19,12 @@ const pixelGrid = GeistPixelGrid;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://collections.wickz.dev"),
-  title: "collections.dev | Artículos y recursos de desarrollo web",
+  title: {
+    default: "collections.dev | Artículos y recursos de desarrollo web",
+    template: "%s | collections.dev",
+  },
   description:
     "collections.dev es una plataforma dedicada a recopilar artículos, recursos y herramientas relacionadas al desarrollo web.",
-  keywords: [
-    "desarrollo web",
-    "artículos de desarrollo",
-    "recursos de programación",
-    "herramientas para desarrolladores",
-    "tutoriales de desarrollo web",
-    "tecnologías web",
-    "programación frontend",
-    "programación backend",
-    "JavaScript",
-    "CSS",
-    "HTML",
-    "React",
-    "Node.js",
-    "Next.js",
-    "Vue.js",
-    "Angular",
-    "Django",
-    "Flask",
-    "Ruby on Rails",
-    "PHP",
-    "Laravel",
-    "Symfony",
-    "Go",
-    "Rust",
-    "DevOps",
-    "cloud computing",
-    "bases de datos",
-    "seguridad web",
-    "optimización de rendimiento",
-    "accesibilidad web",
-    "mejores prácticas de desarrollo",
-  ],
   authors: [{ name: "Wickz", url: "https://wickz.dev" }],
   creator: "Wickz",
   openGraph: {
@@ -96,6 +66,19 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-background">
+        <script
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD estático
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "collections.dev",
+              url: "https://collections.wickz.dev",
+              inLanguage: "es",
+            }),
+          }}
+        />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

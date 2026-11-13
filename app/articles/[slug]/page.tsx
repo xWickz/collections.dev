@@ -40,6 +40,9 @@ export async function generateMetadata({
     title: meta.title,
     description: meta.description,
     alternates: { canonical: `/articles/${slug}` },
+    authors: meta.author
+      ? [{ name: meta.author, url: `https://github.com/${meta.author}` }]
+      : undefined,
     openGraph: {
       type: "article",
       locale: "es_ES",
@@ -48,7 +51,9 @@ export async function generateMetadata({
       description: meta.description,
       siteName: "collections.dev",
       publishedTime: meta.publishedAt,
-      images: "/opengraph-image",
+      tags: meta.tags,
+      section: meta.category,
+      authors: meta.author ? [`https://github.com/${meta.author}`] : undefined,
     },
   };
 }
@@ -65,12 +70,60 @@ export default async function ArticlePage({ params }: PageProps) {
   const dateStr = meta.publishedAt;
   const dateObj = new Date(`${dateStr}T00:00:00`);
   const formattedDate = dateObj.toLocaleDateString("es-ES", {
+    year: "numeric",
     month: "long",
     day: "numeric",
   });
 
+  const url = `https://collections.wickz.dev/articles/${slug}`;
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: meta.title,
+      description: meta.description,
+      url,
+      mainEntityOfPage: url,
+      inLanguage: "es",
+      datePublished: meta.publishedAt,
+      dateModified: meta.publishedAt,
+      keywords: meta.tags.join(", "),
+      articleSection: meta.category,
+      image: `${url}/opengraph-image`,
+      author: meta.author
+        ? {
+            "@type": "Person",
+            name: meta.author,
+            url: `https://github.com/${meta.author}`,
+          }
+        : undefined,
+      publisher: {
+        "@type": "Organization",
+        name: "collections.dev",
+        url: "https://collections.wickz.dev",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Inicio", item: "https://collections.wickz.dev" },
+        { "@type": "ListItem", position: 2, name: "Artículos", item: "https://collections.wickz.dev/articles" },
+        { "@type": "ListItem", position: 3, name: meta.title, item: url },
+      ],
+    },
+  ];
+
   return (
-    <main className="py-12 bg-background text-foreground min-h-screen">
+    <div className="py-12 bg-background text-foreground min-h-screen">
+      {jsonLd.map((d) => (
+        <script
+          key={d["@type"]}
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD estático
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(d) }}
+        />
+      ))}
       <Container>
         <article className="prose prose-invert max-w-none font-sans">
           <header className="mb-10 border-b border-foreground/10 pb-6">
@@ -109,6 +162,6 @@ export default async function ArticlePage({ params }: PageProps) {
       </Container>
 
       <ClientTranslator defaultTarget="en" />
-    </main>
+    </div>
   );
 }

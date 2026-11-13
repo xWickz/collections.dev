@@ -9,13 +9,14 @@ type ClientTranslatorProps = {
   defaultTarget?: string;
 };
 
-export default function ClientTranslator({
-  defaultTarget = "en",
-}: ClientTranslatorProps) {
+export default function ClientTranslator(props: ClientTranslatorProps) {
   if (process.env.NODE_ENV === "production") {
     return null; // No render in production
   }
+  return <Translator {...props} />;
+}
 
+function Translator({ defaultTarget = "en" }: ClientTranslatorProps) {
   const [status, setStatus] = useState<string>("Detectando disponibilidad...");
   const [canTranslate, setCanTranslate] = useState<boolean>(false);
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
