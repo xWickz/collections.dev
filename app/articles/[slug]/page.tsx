@@ -51,6 +51,7 @@ export async function generateMetadata({
       description: meta.description,
       siteName: "collections.dev",
       publishedTime: meta.publishedAt,
+      modifiedTime: meta.updatedAt ?? meta.publishedAt,
       tags: meta.tags,
       section: meta.category,
       authors: meta.author ? [`https://github.com/${meta.author}`] : undefined,
@@ -86,17 +87,29 @@ export default async function ArticlePage({ params }: PageProps) {
       mainEntityOfPage: url,
       inLanguage: "es",
       datePublished: meta.publishedAt,
-      dateModified: meta.publishedAt,
+      dateModified: meta.updatedAt ?? meta.publishedAt,
       keywords: meta.tags.join(", "),
       articleSection: meta.category,
       image: `${url}/opengraph-image`,
-      author: meta.author
-        ? {
-            "@type": "Person",
-            name: meta.author,
-            url: `https://github.com/${meta.author}`,
-          }
-        : undefined,
+      // xWickz es la misma entidad Person de wickz.dev (mismo @id): así
+      // buscadores e IAs atribuyen los artículos al autor del portafolio
+      author:
+        meta.author === "xWickz"
+          ? {
+              "@type": "Person",
+              "@id": "https://wickz.dev/#person",
+              name: "Santiago Griman",
+              alternateName: ["wickz", "xWickz"],
+              url: "https://wickz.dev/",
+              sameAs: ["https://github.com/xWickz"],
+            }
+          : meta.author
+            ? {
+                "@type": "Person",
+                name: meta.author,
+                url: `https://github.com/${meta.author}`,
+              }
+            : undefined,
       publisher: {
         "@type": "Organization",
         name: "collections.dev",
