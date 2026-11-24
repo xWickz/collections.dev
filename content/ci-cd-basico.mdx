@@ -1,0 +1,89 @@
+export const meta = {
+  title: "Guía de CI/CD básica",
+  description: "Agregas un feature y sin querer rompes otro módulo. Con un archivo de GitHub Actions eso no vuelve a llegar a producción.",
+  category: "git",
+  tags: ["ci/cd", "github", "devops", "productividad"],
+  publishedAt: "2026-11-24",
+  published: true,
+  author: "xWickz"
+};
+
+Si ya estás trabajando con un cliente o en un proyecto serio, lo ideal es que esté **siempre disponible**. Y casi nunca se cae por el servidor: se cae porque subiste un feature nuevo y, sin darte cuenta, rompiste otro módulo que ni tocaste.
+
+Ahí es donde entra el **CI/CD** (integración y despliegue continuos). Suena a algo de empresas grandes, pero montarlo te toma 10 minutos (lo básico).
+
+## ¿Qué es CI/CD?
+
+- **CI (integración continua):** cada vez que haces push o abres un PR, una máquina instala tu proyecto desde cero y corre el lint, los tests y el build. Si algo falla, te avisa.
+- **CD (despliegue continuo):** si todo pasó, se despliega solo. Si algo falló, **no se despliega nada**.
+
+La idea es simple: que el error lo encuentre una máquina y no tu cliente.
+
+## 1. El workflow de GitHub Actions
+
+Crea este archivo en tu proyecto: `.github/workflows/ci.yml`
+
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+```
+
+Haz commit, push, y ve a la pestaña **Actions** de tu repo. Ahí verás cada paso corriendo. Desde ahora, cada push a `main` y cada PR pasan por la misma revisión.
+
+¿Todavía no tienes tests? **No pasa nada.** Quita la línea de `pnpm test` y deja el lint y el build. Solo con eso ya atrapas imports rotos, errores de tipos y cosas que compilan en tu máquina pero no en otra.
+
+pero OJO, *`pnpm/action-setup` lee la versión de pnpm del campo `"packageManager"` de tu `package.json`. Si no lo tienes, agrégale `with: version: 9` a ese paso.*
+
+## 2. Proteger la rama `main`
+
+Este es el paso que casi nadie hace, y sin él el workflow solo te avisa pero no te frena.
+
+En tu repo ve a **Settings → Branches → Add rule**, escribe `main` y marca:
+
+- **Require a pull request before merging**
+- **Require status checks to pass before merging** (y elige el job `check`)
+
+Ahora un PR en rojo **no se puede mergear**. Ni siquiera por ti a las 2 de la mañana 😅
+
+## 3. El despliegue (CD)
+
+Si usas **Vercel**, **Netlify** o **Cloudflare Pages**, esta es la parte fácil: conectas el repo y listo.
+
+- Cada push a `main` se publica en producción.
+- Cada PR te da un **link de preview** para probarlo antes de mergear.
+
+Como `main` ya está protegida, a producción solo llega lo que pasó las pruebas. Ese es todo el truco.
+
+## El flujo completo
+
+1. Creas una rama: `git switch -c feature/carrito`
+2. Haces tus cambios, push y abres un PR.
+3. GitHub Actions corre lint, tests y build.
+4. Vercel te da un preview para revisarlo.
+5. Todo en verde → mergeas → se despliega solo.
+6. Algo en rojo → lo arreglas en la rama. Producción ni se entera.
+
+## Conclusión
+
+CI/CD no garantiza que tu servidor nunca se caiga, pero sí que **tus errores** no lleguen a producción, que es lo que pasa la mayoría de las veces. Son 10 minutos de configuración que te ahorran el mensaje del cliente diciendo "oye, se cayó la página".
+
+¿Ya lo usas en tus proyectos? 
