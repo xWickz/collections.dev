@@ -138,7 +138,7 @@ export default async function ArticlePage({ params }: PageProps) {
         />
       ))}
       <Container>
-        <article className="prose prose-invert max-w-none font-sans">
+        <article className="prose max-w-none font-sans">
           <header className="mb-10 border-b border-foreground/10 pb-6">
             <p className="mb-1 text-sm uppercase tracking-tight text-foreground/60 text-center">
               <Link
