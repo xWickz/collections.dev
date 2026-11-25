@@ -64,7 +64,7 @@ export default async function ArticlePage({ params }: PageProps) {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
 
-  if (!article || !article.meta.published) {
+  if (!article) {
     notFound();
   }
 
