@@ -1,8 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllArticles } from "@/lib/mdx";
-
-const BASE_URL = "https://collections.wickz.dev";
-
+import { SITE_URL } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = await getAllArticles();
@@ -11,12 +9,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const latest = new Date(`${articles[0]?.publishedAt}T00:00:00`);
 
   const routes: MetadataRoute.Sitemap = [
-    { url: BASE_URL, lastModified: latest },
-    { url: `${BASE_URL}/articles`, lastModified: latest },
+    { url: SITE_URL, lastModified: latest },
+    { url: `${SITE_URL}/articles`, lastModified: latest },
   ];
 
   const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
-    url: `${BASE_URL}/articles/${article.slug}`,
+    url: `${SITE_URL}/articles/${article.slug}`,
     lastModified: new Date(
       `${article.updatedAt ?? article.publishedAt}T00:00:00`,
     ),

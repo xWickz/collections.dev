@@ -1,6 +1,5 @@
 import { getAllArticles } from "@/lib/mdx";
-
-const BASE_URL = "https://collections.wickz.dev";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
 
@@ -15,12 +14,12 @@ export async function GET() {
     "",
     "## Artículos",
     ...articles.map(
-      (a) => `- [${a.title}](${BASE_URL}/articles/${a.slug}): ${a.description}`,
+      (a) => `- [${a.title}](${SITE_URL}/articles/${a.slug}): ${a.description}`,
     ),
     "",
     "## Páginas clave",
-    `- Inicio: ${BASE_URL}/`,
-    `- Todos los artículos: ${BASE_URL}/articles`,
+    `- Inicio: ${SITE_URL}/`,
+    `- Todos los artículos: ${SITE_URL}/articles`,
     "- Autor: https://wickz.dev/",
     "",
   ].join("\n");

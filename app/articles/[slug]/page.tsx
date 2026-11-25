@@ -9,6 +9,7 @@ import {
   getArticleBySlug,
   getArticleMetaBySlug,
 } from "@/lib/mdx";
+import { SITE_URL } from "@/lib/site";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -76,7 +77,7 @@ export default async function ArticlePage({ params }: PageProps) {
     day: "numeric",
   });
 
-  const url = `https://collections.wickz.dev/articles/${slug}`;
+  const url = `${SITE_URL}/articles/${slug}`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -113,15 +114,20 @@ export default async function ArticlePage({ params }: PageProps) {
       publisher: {
         "@type": "Organization",
         name: "collections.dev",
-        url: "https://collections.wickz.dev",
+        url: SITE_URL,
       },
     },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Inicio", item: "https://collections.wickz.dev" },
-        { "@type": "ListItem", position: 2, name: "Artículos", item: "https://collections.wickz.dev/articles" },
+        { "@type": "ListItem", position: 1, name: "Inicio", item: SITE_URL },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Artículos",
+          item: `${SITE_URL}/articles`,
+        },
         { "@type": "ListItem", position: 3, name: meta.title, item: url },
       ],
     },

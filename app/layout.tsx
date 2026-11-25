@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,7 +19,7 @@ const geistMono = Geist_Mono({
 const pixelGrid = GeistPixelGrid;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://collections.wickz.dev"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "collections.dev | Artículos y recursos de desarrollo web",
     template: "%s | collections.dev",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://collections.wickz.dev",
+    url: SITE_URL,
     title: "collections.dev | Artículos y recursos de desarrollo web",
     description:
       "collections.dev es una plataforma dedicada a recopilar artículos, recursos y herramientas relacionadas al desarrollo web.",
@@ -74,7 +75,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "collections.dev",
-              url: "https://collections.wickz.dev",
+              url: SITE_URL,
               inLanguage: "es",
             }),
           }}
