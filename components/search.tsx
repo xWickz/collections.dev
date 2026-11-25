@@ -39,7 +39,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
           name="type"
           id="type-search"
           className="outline-none bg-transparent text-sm text-foreground/70 cursor-pointer [&>option]:bg-background"
-          defaultValue={searchParams.get("type") || "articles"}
+          value={searchParams.get("type") || "articles"}
           onChange={(e) => handleTypeChange(e.target.value)}
         >
           <option value="articles">Artículo</option>
