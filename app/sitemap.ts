@@ -6,7 +6,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = await getAllArticles();
 
   // Fecha del artículo más reciente (getAllArticles ya viene ordenado)
-  const latest = new Date(`${articles[0]?.publishedAt}T00:00:00`);
+  const latest = articles[0]
+    ? new Date(`${articles[0].publishedAt}T00:00:00`)
+    : new Date();
 
   const routes: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: latest },
