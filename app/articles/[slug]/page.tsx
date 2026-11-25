@@ -9,7 +9,7 @@ import {
   getArticleBySlug,
   getArticleMetaBySlug,
 } from "@/lib/mdx";
-import { SITE_URL } from "@/lib/site";
+import { formatDate, SITE_URL } from "@/lib/site";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -69,13 +69,7 @@ export default async function ArticlePage({ params }: PageProps) {
   }
 
   const { Post, meta } = article;
-  const dateStr = meta.publishedAt;
-  const dateObj = new Date(`${dateStr}T00:00:00`);
-  const formattedDate = dateObj.toLocaleDateString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedDate = formatDate(meta.publishedAt, "long");
 
   const url = `${SITE_URL}/articles/${slug}`;
   const jsonLd = [

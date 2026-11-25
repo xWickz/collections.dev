@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatDate } from "@/lib/categories";
+import { formatDate } from "@/lib/site";
 import type { ArticleListItem } from "@/types/article";
 
 export default function FeaturedArticle({

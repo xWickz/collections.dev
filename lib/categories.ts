@@ -8,13 +8,3 @@ export function countByCategory(
   }
   return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 }
-
-// timeZone UTC: "2026-11-12" se interpreta en UTC y en zonas con offset negativo mostraría el día anterior.
-export function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("es", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
