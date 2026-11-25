@@ -4,18 +4,24 @@ import { useEffect, useState } from "react";
 export default function Hero() {
   const [isGreen, setGreen] = useState(false);
 
+  // Parpadeo verde cada 3–8 s, con un intervalo nuevo en cada vuelta.
   useEffect(() => {
-    const interval = setInterval(
-      () => {
-        setGreen(true);
-        setTimeout(() => {
-          setGreen(false);
-        }, 1000);
-      },
-      Math.random() * 5000 + 3000,
-    );
+    let timer: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      timer = setTimeout(
+        () => {
+          setGreen(true);
+          timer = setTimeout(() => {
+            setGreen(false);
+            schedule();
+          }, 1000);
+        },
+        Math.random() * 5000 + 3000,
+      );
+    };
+    schedule();
 
-    return () => clearInterval(interval);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
