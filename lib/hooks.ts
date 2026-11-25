@@ -3,11 +3,12 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-// Escribe (o borra, si el valor está vacío) un parámetro de la URL actual.
+// Escribe (o borra, si el valor está vacío) un parámetro de búsqueda.
+// Solo "/" y "/articles" filtran; desde cualquier otra página se va a "/articles".
 export function useSetSearchParam() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const { push, replace } = useRouter();
 
   return (key: string, value?: string) => {
     const params = new URLSearchParams(searchParams);
@@ -16,7 +17,11 @@ export function useSetSearchParam() {
     } else {
       params.delete(key);
     }
-    replace(`${pathname}?${params.toString()}`);
+    if (pathname === "/" || pathname === "/articles") {
+      replace(`${pathname}?${params.toString()}`);
+    } else {
+      push(`/articles?${params.toString()}`);
+    }
   };
 }
 
