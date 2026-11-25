@@ -149,7 +149,7 @@ export default async function ArticlePage({ params }: PageProps) {
               </Link>
             </p>
             <h1 className="text-5xl font-bold tracking-tight text-center">
-              {meta.title.replace("| collections.dev", "")}
+              {meta.title}
             </h1>
             <p className="text-foreground/90 text-center text-md font-medium mt-4">
               {meta.description}

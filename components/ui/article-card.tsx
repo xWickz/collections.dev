@@ -15,7 +15,7 @@ export default function ArticleCard({ article }: Props) {
         </p>
         <h2 className="mb-0.5 text-xl font-semibold text-foreground tracking-tight">
           <Link href={`/articles/${article.slug}`} className="hover:underline">
-            {article.title.replace("| collections.dev", "")}
+            {article.title}
           </Link>
         </h2>
 
